@@ -1,0 +1,30 @@
+{
+  "name": "bonk_cp_app",
+  "version": "1.0.0",
+  "description": "Control the Bonkulator from Desktop via USB Serial",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shannon-greenlight/bonk_cp_app.git"
+  },
+  "keywords": [
+    "Eurorack",
+    "Greenface",
+    "Labs",
+    "Synthesizer",
+    "Bonkulator"
+  ],
+  "author": "Shannon Vance",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/shannon-greenlight/bonk_cp_app/issues"
+  },
+  "homepage": "https://github.com/shannon-greenlight/bonk_cp_app#readme",
+  "devDependencies": {
+    "electron": "^25.3.1"
+  }
+}
