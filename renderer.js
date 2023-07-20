@@ -2,7 +2,7 @@
 // be executed in the renderer process for that window.
 // All of the Node.js APIs are available in this process.
 
-const { SerialPort } = require('serialport')
+const { SerialPort, ReadlineParser } = require('serialport')
 const tableify = require('tableify')
 
 async function listSerialPorts() {
@@ -31,17 +31,29 @@ function listPorts() {
 
 // Set a timeout that will check for new serialPorts every 2 seconds.
 // This timeout reschedules itself.
-setTimeout(listPorts, 2000);
+// setTimeout(listPorts, 2000);
 
 listSerialPorts()
 
 const port = new SerialPort({ path: 'COM15', baudRate: 57600 })
+const parser = port.pipe(new ReadlineParser())
+// parser.on('data', console.log)
+parser.on('data', function(data)
+{
+  if(data>'') document.getElementById('message').innerHTML = data
+})
 
-port.write('f5\r', function(err) {
+// port.on('readable', function () {
+//   console.log('Data:', port.read())
+// })
+
+port.write('Z', function(err) {
   if (err) {
     return console.log('Error on write: ', err.message)
   }
+  document.getElementById('message').innerHTML = port.read()
   console.log('message written')
+  // console.log('Data:', port.read())
 })
 
 // Open errors will be emitted as an error event
