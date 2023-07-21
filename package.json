@@ -26,5 +26,8 @@
   "homepage": "https://github.com/shannon-greenlight/bonk_cp_app#readme",
   "devDependencies": {
     "electron": "^25.3.1"
+  },
+  "dependencies": {
+    "jquery": "^3.7.0"
   }
 }

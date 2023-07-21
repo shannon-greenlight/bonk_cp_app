@@ -4,6 +4,7 @@
 
 const { SerialPort, ReadlineParser } = require('serialport')
 const tableify = require('tableify')
+window.$ = window.jQuery = require('jquery');
 
 async function listSerialPorts() {
   await SerialPort.list().then((ports, err) => {
@@ -33,7 +34,7 @@ function listPorts() {
 // This timeout reschedules itself.
 // setTimeout(listPorts, 2000);
 
-listSerialPorts()
+// listSerialPorts()
 
 const port = new SerialPort({ path: 'COM15', baudRate: 57600 })
 const parser = port.pipe(new ReadlineParser())
@@ -51,7 +52,7 @@ port.write('Z', function(err) {
   if (err) {
     return console.log('Error on write: ', err.message)
   }
-  document.getElementById('message').innerHTML = port.read()
+  // document.getElementById('message').innerHTML = port.read()
   console.log('message written')
   // console.log('Data:', port.read())
 })
