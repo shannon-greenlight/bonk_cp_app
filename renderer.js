@@ -607,7 +607,7 @@ function test_me(text) {
     send_cmd("!");
   });
 
-  $("#take_snapshot").click(function () {
+  $("#take_snapshot").on("click", function () {
     // $("#snapshot_text").html(snapshot);
     the_macro.put(snapshot);
   });
@@ -923,64 +923,10 @@ function test_me(text) {
 
     item = `f${data.fxn_num}`;
     out.push(item);
-
-    item = `c${data.cv_val}`;
-    out.push(item);
-
-    if (data.scale !== "disabled") {
-      item = `S${data.scale}`;
-      out.push(item);
-    }
-
-    if (data.offset !== "disabled") {
-      item = `O${data.offset}`;
-      out.push(item);
-    }
-
-    let val = data.clock === "internal" ? 0 : 1;
-    item = `K${val}`;
-    out.push(item);
-
-    val = data.trigger_enable === "enabled" ? 1 : 0;
-    item = `D${val}`;
-    out.push(item);
-
-    val = data.ext_trigger_disable === "enabled" ? 0 : 1;
-    item = `E${val}`;
-    out.push(item);
-
-    val = data.repeat_on === "ON" ? 1 : 0;
-    item = `r${val}`;
-    out.push(item);
-
-    val = data.gate === "ON" ? 1 : 0;
-    item = `G${val}`;
-    out.push(item);
-
-    val = data.toggle === "ON" ? 1 : 0;
-    item = `T${val}`;
-    out.push(item);
-
-    if (data.sequence) {
-      out.push(data.sequence.value);
-      out.push("s"); // select sequence
-      out.push("#0"); // select 1st digit
-      data.sequence.params.forEach(function (item, idx) {
-        if (idx > 0) {
-          out.push("s"); // select sequence
-          out.push("[C"); // next digit
-        }
-        item.forEach(function (val, indx) {
-          out.push(`p${indx}`);
-          out.push(val.numeric_val);
-        });
-      });
-    } else {
-      data.params[0].forEach(function (val, indx) {
-        out.push(`p${indx}`);
-        out.push(val.numeric_val);
-      });
-    }
+    data.params[0].forEach(function (val, indx) {
+      out.push(`p${indx}`);
+      out.push(val.numeric_val);
+    });
 
     return JSON.stringify(out);
   }
