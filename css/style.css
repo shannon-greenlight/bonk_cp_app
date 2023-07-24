@@ -1,0 +1,117 @@
+/* # Child Theme
+Theme Name: Greenface Theme
+Theme URI: XXX
+Version:      1.0.19
+Description: This is the first Greenface theme created for the 2017 Framework.
+Author: Shannon Vance
+Author URI: YYY
+Template: twentyseventeen
+*/
+
+@import url("twentyseventeen/style.css");
+
+:root {
+    /*--header_background: #75b16e;*/
+    --header_background: #aaa;
+}
+
+@media screen and (min-width: 48em) {
+    .home .navigation-top {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: initial !important;
+    }
+    .menu-scroll-down {
+        display: none !important;
+    }
+}
+.entry-content li {
+    /*list-style: none;*/
+    list-style-position: inside;
+}
+
+.entry-content li li {
+    list-style: circle;
+    list-style-position: inside;
+}
+
+.entry-content li li li {
+    list-style: square;
+    list-style-position: inside;
+}
+
+body.category .entry-content.pow .wp-block-image {
+    display: none;
+}
+
+body.single .entry-content.pow .wp-block-image img {
+    opacity: 0.01;
+}
+
+#site-navigation {
+    float: left;
+}
+
+.site-info {
+    display: none;
+}
+
+.entry-title {
+    font-size: 2rem !important;
+}
+
+.entry-header .banners {
+    margin-top: 40px;
+    border-top: 1px dashed #aaa;
+    padding-top: 20px;
+
+    display: none;
+}
+
+.Xentry-header .banners img {
+    width: 300px;
+}
+
+.site-branding svg {
+    height: 100px;
+}
+
+.Xentry-header {
+    position: fixed;
+}
+
+.site-content {
+    padding: 2em 0 0 !important;
+}
+
+.single-featured-image-header, .post-thumbnail {
+    display:none;
+}
+
+.buy, form[target=paypal] {
+    /*display: none;*/
+}
+
+.navigation-top {
+    background: var(--header_background);
+    border-bottom: 1px solid var(--header_background);
+    border-top: 1px solid var(--header_background);
+}
+
+.main-navigation a {
+    font-size: 1.2em;
+    color: #000;
+}
+
+figure.wp-block-image img {
+    box-shadow: #3e3839 24px 30px 20px;
+    /*box-shadow: #3e3839 14px 14px 30px;*/
+}
+
+.page-id-1150 figure.wp-block-image img {
+    box-shadow: none !important;
+}
+
+/*.page-id-873 figure.wp-block-image:last-of-type img {*/
+/*    box-shadow: #3e3839 24px 30px 20px;*/
+/*}*/

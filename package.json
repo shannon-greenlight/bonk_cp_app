@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": {
     "type": "git",
@@ -24,9 +26,7 @@
     "url": "https://github.com/shannon-greenlight/bonk_cp_app/issues"
   },
   "homepage": "https://github.com/shannon-greenlight/bonk_cp_app#readme",
-  "devDependencies": {
-    "electron": "^25.3.1"
-  },
+  "devDependencies": {},
   "dependencies": {
     "jquery": "^3.7.0"
   }
