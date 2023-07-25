@@ -93,4 +93,5 @@ function request_data(cmd) {
       console.log("USB Direct Mode Enabled.", port.read())
     })
   })
+  $("#device_name").css({ "margin-bottom": "15px" })
 })(jQuery)
