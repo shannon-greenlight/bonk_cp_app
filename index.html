@@ -8,22 +8,18 @@
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
 
     <link rel="stylesheet" href="css/bonk_cp.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="css/serial_port.css" type="text/css" media="all" />
     <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
     <link rel="stylesheet" id="twentyseventeen-block-style-css" href="css/blocks.css" type="text/css" media="all" />
 </head>
 
 <body>
-    <!-- <h1>Bonkulator Controls</h1> -->
-
-    <!-- We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, Electron <span id="electron-version"></span>, and Serialport <span id="serialport-version"></span> -->
-
     <div id="error"></div>
     <div id="ports">
         <h1>Welcome to the Bonkulator Control Panel</h1>
         <h2>Please Choose a Port</h2>
         <div id="ports_table"></div>
     </div>
-    <div id="message"></div>
     <div id="control_div">
         <div id="head_div">
             <img src="img/xparent_logo_444.png" title="" />
@@ -200,13 +196,10 @@
                 </div>
             </div>
         </div>
-        <!--        <div id="snapshot_container">-->
-        <!--            <label for="snapshot_text">Snapshot</label>-->
-        <!--            <textarea name="snapshot_text" id="snapshot_text"></textarea>-->
-        <!--        </div>-->
     </div>
 </body>
 
+<script src="./serial_port.js"></script>
 <script src="./renderer.js"></script>
 
 </html>

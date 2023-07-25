@@ -1,0 +1,60 @@
+/* for listPorts */
+#ports {
+  font-size: 0.7em;
+}
+
+#ports table {
+  border: 2px solid;
+  margin: 10px 10px 10px 20px;
+  width: 650px;
+}
+
+#ports table th {
+  background-color: #555;
+  color: #ffffff;
+}
+
+#ports table th,
+#ports table td {
+  padding-left: 5px;
+}
+
+#ports h1 {
+  /* font-size: 1.2em; */
+  margin-bottom: 0;
+  margin-top: 20px;
+  padding-left: 20px;
+}
+
+#ports h2 {
+  /* font-size: 1.2em; */
+  margin-bottom: 0;
+  margin-top: 10px;
+  padding: 0 0 0 20px;
+}
+
+#ports td:first-child {
+  cursor: pointer;
+}
+
+#ports td:nth-child(2),
+#ports td:nth-child(3),
+#ports td:nth-child(4),
+#ports td:nth-child(5),
+#ports td:nth-child(8),
+#ports td:nth-child(8) {
+  display: none;
+}
+
+#ports th:nth-child(2),
+#ports th:nth-child(3),
+#ports th:nth-child(4),
+#ports th:nth-child(5),
+#ports th:nth-child(8),
+#ports th:nth-child(8) {
+  display: none;
+}
+
+#control_div {
+  display: none;
+}
