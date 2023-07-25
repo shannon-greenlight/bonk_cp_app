@@ -94,4 +94,5 @@ function request_data(cmd) {
     })
   })
   $("#device_name").css({ "margin-bottom": "15px" })
+  $("#head_div>img").attr("src", "img/xparent_logo_444.png")
 })(jQuery)
