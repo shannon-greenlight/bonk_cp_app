@@ -845,7 +845,7 @@ function widget(data) {
   }
 
   receive_data = function (text) {
-    dbugger.print(text, true)
+    dbugger.print(text, false)
     data = JSON.parse(text)
     // data = text
 
@@ -907,6 +907,5 @@ function widget(data) {
       }
     }
   }, 250)
-
-  refresh_screen()
+  if (typeof url !== "undefined") refresh_screen()
 })(jQuery)
