@@ -29,6 +29,10 @@ h3 {
   font-family: PermanentMarker, sans-serif;
 }
 
+#refresh_button {
+  display: none;
+}
+
 .entry-content {
   /*height: 975px;*/
 }
