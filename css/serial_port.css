@@ -1,6 +1,14 @@
 /* for listPorts */
+:root {
+  /* --app_background: #97796e; */
+  --app_background: #7e977e;
+  --gradient_from: #d7cfc8;
+  --gradient_to: #8f8277;
+  /* 97796e */
+}
+
 #ports {
-  font-size: 0.7em;
+  font-size: 0.85em;
 }
 
 #ports table {

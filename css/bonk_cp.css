@@ -58,14 +58,16 @@ input {
   position: relative;
   padding: 0px 30px 30px 30px;
   width: 1100px;
+  min-height: 967px;
   border: 1px solid #555;
-  background-color: #7e977e;
+  background-color: var(--app_background);
+  background-image: linear-gradient(
+    to bottom,
+    var(--gradient_from),
+    var(--gradient_to)
+  );
   /*background-image: linear-gradient(to bottom, #cfaa7c, #cfaa7c);*/
   /*background-color: #cfc7c0;*/
-  /*background-image: linear-gradient(to bottom, #d7cfc8, #b9b1aa);*/
-  /*background-image: url('https://www.greenfacelabs.com/wp-content/uploads/2020/10/parchment.jpg');*/
-  /*background-image: url('https://www.greenfacelabs.com/three/img/8k_saturn.jpg');*/
-  /*background-image: url('https://www.greenfacelabs.com/three/img/moon_nasa.jpg');*/
   /*background-image: linear-gradient(to bottom, #997780, #f7dde0);*/
 }
 
@@ -121,7 +123,8 @@ strong {
   grid-column: 1 / span 2;
   padding: 5px;
   font-size: 2.5rem;
-  border-bottom: 2px solid #a9a;
+  border: 2px solid #a9a;
+  border-bottom: 0px solid #a9a;
   background-color: #d6b6ea;
   /*margin-bottom: 10px;*/
 }
@@ -170,16 +173,16 @@ strong {
 .indicator {
   margin-top: 5px;
   border-radius: 15px;
-  background-color: #7e977e;
+  background-color: transparent;
   padding: 5px 32px;
   cursor: default;
 }
 
-.display_box {
+/* .display_box {
   border: 1px dotted;
   padding: 10px;
 }
-
+ */
 #display_div {
   min-height: 150px;
   width: 450px;
@@ -309,13 +312,13 @@ strong {
 }
 
 #trigger_buttons {
-  height: 343px;
-  padding-top: 45px;
+  /* height: 343px; */
+  padding-top: 40px;
   display: grid;
   justify-content: left;
   grid-template-columns: 1fr 1fr 4fr;
   grid-template-rows: auto auto auto auto;
-  grid-row-gap: 60px;
+  grid-row-gap: 62px;
 }
 
 #trigger_buttons button {
