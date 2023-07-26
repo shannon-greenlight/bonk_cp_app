@@ -708,7 +708,7 @@ function widget(data) {
       let background_color = ""
       switch (this.state) {
         case "IDLE":
-          background_color = "#7e977e"
+          background_color = ""
           $("#macro_buttons .indicator")
             .html("&nbsp;")
             .css("background-color", background_color)
@@ -846,7 +846,11 @@ function widget(data) {
 
   receive_data = function (text) {
     dbugger.print(text, false)
-    data = JSON.parse(text)
+    try {
+      data = JSON.parse(text)
+    } catch (e) {
+      console.log(e)
+    }
     // data = text
 
     console.log("Receiving:", data)
