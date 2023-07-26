@@ -295,14 +295,9 @@ strong {
   width: 100%;
 }
 
-#trigger_controls {
-  width: 200px;
-}
-
 #trigger_controls,
 #adj_controls {
-  margin-bottom: 0;
-  /* height: 100px; */
+  width: 200px;
 }
 
 #adj_div {
