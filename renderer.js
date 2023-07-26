@@ -717,6 +717,7 @@ function widget(data) {
             .attr("title", "Click to Start Recording")
             .css("background-color", "#444444")
             .prop("disabled", false)
+          this.exe_button.prop("disabled", false)
           this.snapshot_button.prop("disabled", false)
           break
         case "REC":
@@ -724,11 +725,12 @@ function widget(data) {
           $("#rec_state")
             .html(this.state)
             .css("background-color", background_color)
+          this.exe_button.prop("disabled", true)
           this.record_button
             .html("Stop")
             .attr("title", "Click to Stop Recording")
             .prop("disabled", false)
-            .css("background-color", "#888")
+          // .css("background-color", "#888")
           this.snapshot_button.prop("disabled", true)
           break
         case "EXEC":
@@ -739,6 +741,7 @@ function widget(data) {
           this.record_button
             .prop("disabled", true)
             .css("background-color", "#888")
+          this.exe_button.prop("disabled", true)
           this.snapshot_button.prop("disabled", true)
           break
       }
