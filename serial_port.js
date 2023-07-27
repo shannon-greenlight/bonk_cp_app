@@ -67,6 +67,7 @@ function request_data(cmd) {
   // console.log("Hey there!!!!!");
   $("#ports").on("click", "td:first-child", function () {
     chosen_port = $(this).html()
+    document.title += ` on ${chosen_port}`
     port = new SerialPort({ path: chosen_port, baudRate: 115200 })
     parser = port.pipe(new ReadlineParser({ delimiter: "\r\n\r\n" }))
     // port.path = chosen_port
