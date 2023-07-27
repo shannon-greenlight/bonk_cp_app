@@ -301,6 +301,9 @@ function widget(data) {
       meas_div.css({ "text-align": "center" })
       $("#adj_controls, #trigger_controls").show()
   }
+  if (data.in_user_waveforms()) {
+    $("#adj_controls, #trigger_controls").hide()
+  }
 
   let controls = ""
   let param_set = 0 // only one param set
@@ -826,13 +829,13 @@ function widget(data) {
 
   function take_snapshot(data) {
     // todo capture all user data
-    // console.log(data);
+    // console.log("Snapshot data", data)
     let retval = 0
     let item = ""
     let out = []
 
     // if(data.fxns) {
-    //     const fxn = data.fxns.indexOf(data.fxn);
+    //     const fxn = data_in.fxns.indexOf(data.fxn);
     //     let item=`f${fxn}`;
     //     out.push(item);
     // }
@@ -844,6 +847,29 @@ function widget(data) {
       out.push(val.type == "text" ? "$" + val.value : val.numeric_val)
     })
 
+    if (data.in_user_waveforms()) {
+      console.log("Taking snapshot of " + data.fxn)
+
+      out.shift() // amend start of macro
+      const user_wave_num = data.fxn.charAt(5)
+      out.unshift("!")
+      out.unshift(user_wave_num)
+      out.unshift("p6")
+      out.unshift("f8")
+
+      const values = data.message.split(", ")
+      // out.push(`p6`)
+      // out.push(`!`)
+      out.push(`p1`)
+      out.push(`0`)
+      out.push(`p2`)
+      for (const val of values) {
+        out.push(`${val}`)
+        out.push(`!`)
+        // console.log(`"${val}","!",`)
+      }
+    }
+
     return JSON.stringify(out)
   }
 
@@ -853,8 +879,12 @@ function widget(data) {
       data = JSON.parse(text)
     } catch (e) {
       console.log(e)
+      console.log(text)
     }
     // data = text
+    data.in_user_waveforms = function () {
+      return this.fxn_num === "8" && this.fxn.indexOf("User") === 0
+    }
 
     console.log("Receiving:", data)
     snapshot = take_snapshot(data)
