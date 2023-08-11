@@ -4,7 +4,8 @@ const { SerialPort, ReadlineParser } = require("serialport")
 const tableify = require("tableify")
 window.$ = window.jQuery = require("jquery")
 
-const canvas_delay = 1005 // need to wait before drawing
+// const canvas_delay = 1005 // need to wait before drawing
+const canvas_delay = 5 // need to wait before drawing
 
 async function listSerialPorts() {
   await SerialPort.list().then((ports, err) => {
@@ -49,22 +50,26 @@ function prep_request(cmd) {
   //   if (cmd === "") res.fail = true
   res.cmd = cmd + "\r"
   if (!res.fail) {
-    console.log("Sending: " + cmd + "...")
+    console.log("Sending: " + cmd)
+    $("#busy_div").fadeIn(10)
   }
   return res
 }
 
 function request_data(cmd) {
-  port.write(cmd, function (err) {
+  // console.log("Requesting: " + cmd)
+  const buff = Buffer.from(cmd)
+  port.write(buff, function (err) {
     if (err) {
       return console.log("Error on write: ", err.message)
     }
-    console.log(`Message: ${cmd} sent to serial port: ${chosen_port}`)
+    console.log(`Command: ${cmd} sent to serial port: ${chosen_port}`)
   })
 }
 
 ;(function ($) {
   // console.log("Hey there!!!!!");
+  $("#busy_div").fadeOut(1).css("opacity", 1)
   $("#ports").on("click", "td:first-child", function () {
     chosen_port = $(this).html()
     document.title += ` on ${chosen_port}`
@@ -77,6 +82,7 @@ function request_data(cmd) {
     parser.on("data", function (text) {
       if (text > "") {
         receive_data(text)
+        $("#busy_div").fadeOut(10)
       }
     })
     console.log("Timeout: " + listPortsTimeout)
@@ -92,6 +98,9 @@ function request_data(cmd) {
         return console.log("Error on write: ", err.message)
       }
       console.log("USB Direct Mode Enabled.", port.read())
+      setTimeout(function () {
+        port.write("\r")
+      }, 1000)
     })
   })
   $("#device_name").css({ "margin-bottom": "15px" })
