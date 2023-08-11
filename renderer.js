@@ -7,6 +7,79 @@ let dbugger = {
   },
 }
 
+const OP_MODE_NORMAL = 0
+const OP_MODE_DRAW = 1
+let op_mode = OP_MODE_NORMAL // normal, draw
+
+const DRAW_MODE_OFF = 0
+const DRAW_MODE_ON = 1
+let draw_mode = DRAW_MODE_OFF
+document.body.onmouseup = function () {
+  draw_mode = DRAW_MODE_OFF
+}
+
+$ = jQuery
+const meas_div = $("#meas_div")
+const the_canvas = $("#canvas")
+let waveform_data
+
+let user_waveform_obj = {
+  c: 0,
+  ctx: 0,
+  wave_arr: [],
+  wave_arr_length: 0,
+  cwidth: 0,
+  cheight: 0,
+  calc_w: function (i) {
+    return parseInt((i / this.wave_arr_length) * this.cwidth, 10)
+  },
+  calc_h: function (i) {
+    return this.cheight - parseInt((this.wave_arr[i] / data.dac_fs) * (this.cheight - 2), 10) - 2
+  },
+  set_variables: function () {
+    this.c = document.getElementById("canvas")
+    this.ctx = this.c.getContext("2d")
+    this.wave_arr = waveform_data
+    this.wave_arr_length = this.wave_arr.length
+    this.cwidth = the_canvas.width()
+    this.cheight = the_canvas.height()
+  },
+  // draw index indicator if in User Waveforms
+  draw_index: function () {
+    this.set_variables()
+    // const wave_index = parseInt(data.params[0][1].value) + 1
+    // const wave_index = parseInt($(`input[name=p1]`).parent().find("div.param_body").html())
+    const wave_index = parseInt($(`input[name=p1]`).val())
+    console.log(`Wave index: ${wave_index}`)
+    if (data.fxn.indexOf("User") === 0) {
+      // this.ctx = this.c.getContext("2d")
+      this.ctx.beginPath()
+      this.ctx.strokeStyle = "#FF0000"
+      this.ctx.moveTo(this.calc_w(wave_index), this.calc_h(wave_index))
+      this.ctx.arc(this.calc_w(wave_index), this.calc_h(wave_index), 2, 0, 2 * Math.PI)
+      this.ctx.stroke()
+    }
+  },
+  draw_waveform: function () {
+    this.set_variables()
+    let self = this
+    // console.log(self.wave_arr)
+    self.ctx.beginPath()
+    self.ctx.clearRect(0, 0, self.cwidth, self.cheight)
+    self.ctx.strokeStyle = "#000000"
+    // console.log(ctx);
+    self.ctx.moveTo(0, self.calc_h(0))
+    for (i = 0; i < self.wave_arr_length; i++) {
+      self.ctx.lineTo(self.calc_w(i), self.calc_h(i))
+    }
+    self.ctx.stroke()
+    self.draw_index()
+  },
+}
+
+// user_waveform_obj.c = document.getElementById("canvas")
+// user_waveform_obj.ctx = user_waveform_obj.c.getContext("2d")
+
 // const out_fs = 128 / 12;
 // const out_fs = 5.463*2;
 let out_fs = 0
@@ -27,8 +100,7 @@ function display_param(data) {
   const is_selected = data.selected === "true"
   const selected_class = is_selected ? " selected" : ""
   let control = "<div class='param_div" + selected_class + "' >"
-  control +=
-    " <div class='param param_head'><label>" + data.label + "</label></div>"
+  control += " <div class='param param_head'><label>" + data.label + "</label></div>"
   control += " <div class='param param_val " + data.type + selected_class + "'>"
   switch (data.type) {
     case "radio":
@@ -41,8 +113,7 @@ function display_param(data) {
         control += ' type="radio"'
         // this prevents radio button from jumping around
         if (data.cmd === "p") {
-          if ($(`input[name=${input_name}][value=${i}]:checked`).length)
-            control += " checked "
+          if ($(`input[name=${input_name}][value=${i}]:checked`).length) control += " checked "
         } else {
           if (data.value === values[i]) control += " checked "
         }
@@ -65,10 +136,7 @@ function display_param(data) {
       control += ' value="' + data_value + '" />'
       control += "<div>"
       control += dval.slice(0, data.dig_num)
-      control += `<span class="${hilight}">${dval.substr(
-        data.dig_num,
-        1
-      )}</span>${tail}</div>`
+      control += `<span class="${hilight}">${dval.substr(data.dig_num, 1)}</span>${tail}</div>`
       control += "</div>"
       break
     default:
@@ -108,10 +176,7 @@ function display_param(data) {
         plussign = ""
       }
       dbugger.print(`n: ${n}`, false)
-      if (
-        data.selected === "true" &&
-        (data.type === "number" || data.type === "text")
-      ) {
+      if (data.selected === "true" && (data.type === "number" || data.type === "text")) {
         tail = n.slice(parseInt(data.dig_num) + 1)
         control += plussign
         control += n.slice(0, data.dig_num)
@@ -187,7 +252,7 @@ function fxn_button(data, i) {
   return out
 }
 
-let selected_data, selected_val
+let selected_data, selected_param
 function widget(data) {
   $ = jQuery
   const bonk_title = `Hi! I'm ${data.device_name}, your Bonkulator and this is my Control Panel.
@@ -201,8 +266,8 @@ function widget(data) {
   } else {
     out_offset = out_fs / 2
   }
-  const meas_div = $("#meas_div")
-  const the_canvas = $("#canvas")
+  // const meas_div = $("#meas_div")
+  // const the_canvas = $("#canvas")
 
   let title = $("#head_div img").attr("title").toString()
   title = title.replace("Spanky", data.device_name)
@@ -211,9 +276,7 @@ function widget(data) {
   $("#device_name").html(`"${data.device_name.trim()}"`)
   // $("#spank_fxn").html("<span class='fxn_head'> "+data.fxn+"</span>");
   $("#param_label").html(data.fxn)
-  $("#input_div .param_div").append(
-    '<div id="param_value" class="param"></div>'
-  )
+  $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
 
   const activate_button = $("#activate_button")
   if (data.param_active == "1") {
@@ -245,51 +308,21 @@ function widget(data) {
   // $("#analog_label").html(data.quantized)
 
   if (data.message) {
-    the_canvas.show()
+    console.log(data.fxn)
+    console.log(data.message)
+    if (data.fxn === "WiFi") {
+      $("#message_div").html(data.message).addClass("big_message")
+    } else {
+      $("#message_div").html("").removeClass("big_message")
+      waveform_data = data.message.split(", ")
+      setTimeout(function () {
+        user_waveform_obj.draw_waveform()
+        the_canvas.show()
+      }, canvas_delay)
+    }
     meas_div.show()
-    const wave_arr = data.message.split(", ")
-    const wave_arr_length = wave_arr.length
-    const wave_index = parseInt(data.params[0][1].value) + 1
-    dbugger.print(`Wave Index: ${wave_index}`, false)
-    // console.log(wave_arr);
-    // console.log("array count: "+wave_arr_length);
-    // draw a waveform here
-    setTimeout(function () {
-      const cwidth = the_canvas.width()
-      const cheight = the_canvas.height()
-      let calc_w = function (i) {
-        return parseInt((i / wave_arr_length) * cwidth, 10)
-      }
-      let calc_h = function (i) {
-        return (
-          cheight -
-          parseInt((wave_arr[i] / data.dac_fs) * (cheight - 2), 10) -
-          2
-        )
-      }
-      var c = document.getElementById("canvas")
-      var ctx = c.getContext("2d")
-      ctx.beginPath()
-      ctx.clearRect(0, 0, cwidth, cheight)
-      ctx.strokeStyle = "#000000"
-      // console.log(ctx);
-      ctx.moveTo(0, calc_h(0))
-      for (i = 0; i < wave_arr_length; i++) {
-        ctx.lineTo(calc_w(i), calc_h(i))
-      }
-      ctx.stroke()
-
-      // draw index indicator if in User Waveforms
-      if (data.fxn.indexOf("User") === 0) {
-        ctx = c.getContext("2d")
-        ctx.beginPath()
-        ctx.strokeStyle = "#FF0000"
-        ctx.moveTo(calc_w(wave_index), calc_h(wave_index))
-        ctx.arc(calc_w(wave_index), calc_h(wave_index), 2, 0, 2 * Math.PI)
-        ctx.stroke()
-      }
-    }, canvas_delay)
   } else {
+    the_canvas.hide()
     meas_div.hide()
   }
 
@@ -303,14 +336,19 @@ function widget(data) {
   }
   if (data.in_user_waveforms()) {
     $("#adj_controls, #trigger_controls").hide()
+    $("#draw_controls").show()
+  } else {
+    $("#draw_controls").hide()
   }
 
   let controls = ""
   let param_set = 0 // only one param set
-  for (let i = 0; i < data.params[param_set].length; i++) {
-    data.params[param_set][i].dig_num = data.digit_num
-    data.params[param_set][i].cmd = data.cmd
-    controls += display_param(data.params[param_set][i])
+  if (data.params[param_set]) {
+    for (let i = 0; i < data.params[param_set].length; i++) {
+      data.params[param_set][i].dig_num = data.digit_num
+      data.params[param_set][i].cmd = data.cmd
+      controls += display_param(data.params[param_set][i])
+    }
   }
   // controls += display_param({ label: "<span class='hide'>a</span>", type: "param_buttons"})
   $("#params").html(controls)
@@ -326,53 +364,91 @@ function widget(data) {
       return param.label === capitalizeFirstLetter(item) + ": "
     }
 
-    const res = data.params[0].find(find_param)
-    if (res) {
-      let item_max = data[$(this).attr("max")]
-      let item_min = data[$(this).attr("min")]
-      if (item === "Idle Value") {
-        item_max = res.max
-        item_min = res.min
-      }
-      const item_val = res.value
-      const selector = `[id='${item}'],[id='${item}_slider']`
-      dbugger.print(`Item: ${item_val}`, false)
-      dbugger.print(selector, false)
-      const items = $(selector)
-      const item_input = $(`[id='${item}']`)
-      const item_slider = $(`[id='${item}_slider']`)
-      if (data[item] === "disabled" || res["value"] === "N/A") {
-        items.prop("disabled", true)
-      } else {
-        items
-          .prop("disabled", false)
-          .attr("max", item_max)
-          .attr("min", item_min)
-        item_slider.val(item_val)
-        switch (item) {
-          case "scale":
-          case "randomness":
-            // item_input.val(Math.round(100*item_val/item_max))
-            item_input.val(item_val)
-            break
-          case "Idle Value":
-            let ival = parseFloat(item_val) / Math.pow(10, res.dp)
-            dbugger.print(`dp: ${res.dp}`, false)
-            dbugger.print(`Idle value: ${ival}`, false)
-            item_input.val(ival)
-            // item_input.val((out_fs*item_val/item_max - out_offset).toFixed(2))
-            break
-          case "offset":
-            dbugger.print(`Offset value: ${item_val}`, false)
-            dbugger.print(`out_fs: ${out_fs}`, true)
-            dbugger.print(`out_offset: ${out_offset}`, false)
-            // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
-            item_input.val(item_val)
-            break
+    if (data.params[0]) {
+      const res = data.params[0].find(find_param)
+      if (res) {
+        let item_max = data[$(this).attr("max")]
+        let item_min = data[$(this).attr("min")]
+        if (item === "Idle Value") {
+          item_max = res.max
+          item_min = res.min
+        }
+        const item_val = res.value
+        const selector = `[id='${item}'],[id='${item}_slider']`
+        dbugger.print(`Item: ${item_val}`, false)
+        dbugger.print(selector, false)
+        const items = $(selector)
+        const item_input = $(`[id='${item}']`)
+        const item_slider = $(`[id='${item}_slider']`)
+        if (data[item] === "disabled" || res["value"] === "N/A") {
+          items.prop("disabled", true)
+        } else {
+          items.prop("disabled", false).attr("max", item_max).attr("min", item_min)
+          item_slider.val(item_val)
+          switch (item) {
+            case "scale":
+            case "randomness":
+              // item_input.val(Math.round(100*item_val/item_max))
+              item_input.val(item_val)
+              break
+            case "Idle Value":
+              let ival = parseFloat(item_val) / Math.pow(10, res.dp)
+              dbugger.print(`dp: ${res.dp}`, false)
+              dbugger.print(`Idle value: ${ival}`, false)
+              item_input.val(ival)
+              // item_input.val((out_fs*item_val/item_max - out_offset).toFixed(2))
+              break
+            case "offset":
+              dbugger.print(`Offset value: ${item_val}`, false)
+              dbugger.print(`out_fs: ${out_fs}`, true)
+              dbugger.print(`out_offset: ${out_offset}`, false)
+              // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
+              item_input.val(item_val)
+              break
+          }
         }
       }
     }
   })
+
+  // now disable sliders whose vals are controlled by CV inputs
+  function set_adj(search_label, search_id) {
+    function find_label(value, index, array) {
+      return value.label === search_label
+    }
+
+    let param_index = -1
+    let param_val
+    try {
+      param_index = data.params[0].find(find_label).param_num
+    } catch (e) {
+      dbugger.print(`${search_label} not found!`, true)
+    }
+    if (param_index !== -1) {
+      param_val = $(`input[name=p${param_index}]`).val()
+      $(`#adj_div input[id="${search_id}"], #adj_div input[id="${search_id}_slider"]`).prop(
+        "disabled",
+        param_val.indexOf("CV") === 0
+      )
+      // if (param_val.indexOf("CV") === 0) {
+      //   console.log(`${search_label} at index ${param_index} value: ${param_val} Disabled!`)
+      //   console.log(`#adj_div input#${search_id}, #adj_div input#${search_id}_slider`)
+      //   $(`#adj_div input[id="${search_id}"], #adj_div input[id="${search_id}_slider"]`).prop(
+      //     "disabled",
+      //     true
+      //   )
+      // }
+    }
+  }
+
+  set_adj("Scale: ", "scale")
+  set_adj("Offset: ", "offset")
+  set_adj("Randomness: ", "randomness")
+  set_adj("Idle Value: ", "Idle Value")
+
+  // console.log(`Offset index: ${param_index}  value: ${param_val}`)
+
+  // console.log(param_index)
 
   //$("#cv_val, #cv_val_slider").prop("disabled", data.fxn==="LFO");
 
@@ -381,7 +457,11 @@ function widget(data) {
   let is_selected = (param) => {
     return param.selected === "true"
   }
-  selected_data = data.params[0].find(is_selected)
+  if (data.params[0]) {
+    selected_data = data.params[0].find(is_selected)
+  } else {
+    selected_data = null
+  }
   if (selected_data) {
     console.log("Selected: ", selected_data)
     //let selected_data=data.params[0][data.param_num];
@@ -393,8 +473,7 @@ function widget(data) {
     if (
       !(
         selected_data.type === "radio" ||
-        (selected_data.type === "select" &&
-          selected_data.values.split(",").length === 1)
+        (selected_data.type === "select" && selected_data.values.split(",").length === 1)
       )
     ) {
       // console.log("Component: " +the_input.attr("component"));
@@ -433,7 +512,9 @@ function widget(data) {
       }
       $("#message_div").html(hint)
     } else {
-      $("#message_div").html("")
+      if (data.fxn !== "WiFi") {
+        $("#message_div").html("")
+      }
     }
   } else {
     $("#input_div, #inc_controls").hide()
@@ -456,12 +537,10 @@ function widget(data) {
   const selected_type = $("#param_input").attr("type")
   $("#lr_buttons button, #inc_controls button").prop(
     "disabled",
-    (selected_type !== "number" && selected_type !== "text") ||
-      $("#param_input").is(":hidden")
+    (selected_type !== "number" && selected_type !== "text") || $("#param_input").is(":hidden")
   )
 
-  if ($("div.param_div label")[15])
-    $("div.param_div label")[15].innerHTML = "Idle Value: "
+  if ($("div.param_div label")[15]) $("div.param_div label")[15].innerHTML = "Idle Value: "
   // $("div.param_div label")[15].innerHTML="Idle Value(x1000): "
 }
 
@@ -473,42 +552,86 @@ function widget(data) {
   let params = $("#params")
 
   $("#canvas").on("mousemove", function (e) {
-    let title
-    switch (selected_data.param_num) {
-      case "1":
-        selected_val = parseInt((e.offsetX * 128) / $(this).width())
-        title = `Index: ${selected_val}`
-        break
-      case "2":
-        selected_val = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
-        title = `Value: ${selected_val}`
-        break
-      default:
-        selected_val = NaN
-        title = ""
+    const selected_index = parseInt((e.offsetX * 128) / $(this).width())
+    const selected_value = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
+    if (draw_mode === DRAW_MODE_ON && op_mode === OP_MODE_DRAW) {
+      console.log(`Index: ${selected_index} Value: ${selected_value}`)
+      $(`input[name=p1]`).val(selected_index).parent().find("div.param_body").html(selected_index)
+      $(`input[name=p2]`).parent().find("div.param_body").html(selected_value)
+      waveform_data[selected_index] = selected_value
+      user_waveform_obj.draw_waveform()
+    } else {
+      let title
+      switch (selected_data.param_num) {
+        case "1":
+          selected_param = selected_index
+          title = `Index: ${selected_param}`
+          break
+        case "2":
+          selected_param = selected_value
+          title = `Value: ${selected_param}`
+          break
+        default:
+          selected_param = NaN
+          title = ""
+      }
+      $(this).attr("title", title)
     }
-    $(this).attr("title", title)
   })
 
   $("#canvas").on("click", function (e) {
-    if (!isNaN(selected_val)) {
-      // console.log("On click")
-      $(`input[name=p${selected_data.param_num}]`).val(selected_val)
-      switch (selected_data.param_num) {
-        case "1":
-          $(`input[name=p1]`).trigger("change")
-          break
-        case "2":
-          $(`input[name=p2]`).trigger("change")
-          send_cmd("!")
-          break
-        default:
+    if (op_mode !== OP_MODE_DRAW) {
+      if (!isNaN(selected_param)) {
+        // console.log("On click")
+        $(`input[name=p${selected_data.param_num}]`).val(selected_param)
+        switch (selected_data.param_num) {
+          case "1":
+            $(`input[name=p1]`).trigger("change")
+            break
+          case "2":
+            $(`input[name=p2]`).trigger("change")
+            send_cmd("!")
+            break
+          default:
+        }
       }
     }
   })
 
+  $("#canvas").on("mousedown", function (e) {
+    draw_mode = DRAW_MODE_ON
+  })
+
+  $("#canvas").on("mouseup", function (e) {
+    draw_mode = DRAW_MODE_OFF
+  })
+
   $("#activate_button").on("click", function () {
     send_cmd("!")
+  })
+
+  function tog_drawing(o) {
+    op_mode = op_mode === OP_MODE_DRAW ? OP_MODE_NORMAL : OP_MODE_DRAW
+    $(
+      "#fxn_buttons .cmd_button, #param_box, #param_box select, #param_box button, #param_box input"
+    ).prop("disabled", op_mode === OP_MODE_DRAW)
+    $("#param_value input").css("display", op_mode === OP_MODE_DRAW ? "none" : "inline-block")
+    $("#activate_button").fadeTo(500, op_mode === OP_MODE_DRAW ? 0 : 100)
+    $("#cancel_draw_controls").toggle()
+    $("#cancel_draw_button").fadeTo(500, op_mode === OP_MODE_DRAW ? 100 : 0)
+    $("#draw_button").html(op_mode === OP_MODE_DRAW ? "Save Drawing" : "Draw Waveform")
+    $("#message_div").html(op_mode === OP_MODE_DRAW ? "Draw slowly in any direction" : "")
+  }
+
+  $("#cancel_draw_button").on("click", function () {
+    tog_drawing($(this))
+    refresh_screen()
+  })
+
+  $("#draw_button").on("click", function () {
+    tog_drawing($(this))
+    // $(this).html(op_mode === OP_MODE_DRAW ? "Stop Drawing" : "Draw Waveform")
+    if (op_mode === OP_MODE_NORMAL) send_waveform()
   })
 
   $("#take_snapshot").on("click", function () {
@@ -529,9 +652,7 @@ function widget(data) {
 
   $(".outputs div").on("click", function () {
     const output_num = $(this).html()
-    const trig_num = parseInt(
-      $(this).parent().attr("id").replace("outputs", "")
-    )
+    const trig_num = parseInt($(this).parent().attr("id").replace("outputs", ""))
     dbugger.print(`Trigger: ${trig_num} Output: ${output_num}`, false)
     // set trigger number
     send_cmd(`t${trig_num}`)
@@ -678,9 +799,7 @@ function widget(data) {
       return this.state === "REC"
     },
     macro_exists: function () {
-      return (
-        Array.isArray(this.recorded_macro) && this.recorded_macro.length > 0
-      )
+      return Array.isArray(this.recorded_macro) && this.recorded_macro.length > 0
     },
     set_buttons: function () {
       this.exe_button.prop("disabled", !this.macro_exists())
@@ -712,9 +831,7 @@ function widget(data) {
       switch (this.state) {
         case "IDLE":
           background_color = ""
-          $("#macro_buttons .indicator")
-            .html("&nbsp;")
-            .css("background-color", background_color)
+          $("#macro_buttons .indicator").html("&nbsp;").css("background-color", background_color)
           this.record_button
             .html("Record")
             .attr("title", "Click to Start Recording")
@@ -725,9 +842,7 @@ function widget(data) {
           break
         case "REC":
           background_color = "#f00"
-          $("#rec_state")
-            .html(this.state)
-            .css("background-color", background_color)
+          $("#rec_state").html(this.state).css("background-color", background_color)
           this.exe_button.prop("disabled", true)
           this.record_button
             .html("Stop")
@@ -738,12 +853,8 @@ function widget(data) {
           break
         case "EXEC":
           background_color = "#080"
-          $("#play_state")
-            .html(this.state)
-            .css("background-color", background_color)
-          this.record_button
-            .prop("disabled", true)
-            .css("background-color", "#888")
+          $("#play_state").html(this.state).css("background-color", background_color)
+          this.record_button.prop("disabled", true).css("background-color", "#888")
           this.exe_button.prop("disabled", true)
           this.snapshot_button.prop("disabled", true)
           break
@@ -842,13 +953,15 @@ function widget(data) {
 
     item = `f${data.fxn_num}`
     out.push(item)
-    data.params[0].forEach(function (val, indx) {
-      out.push(`p${indx}`)
-      out.push(val.type == "text" ? "$" + val.value : val.numeric_val)
-    })
+    if (data.params[0]) {
+      data.params[0].forEach(function (val, indx) {
+        out.push(`p${indx}`)
+        out.push(val.type == "text" ? "$" + val.value : val.numeric_val)
+      })
+    }
 
     if (data.in_user_waveforms()) {
-      console.log("Taking snapshot of " + data.fxn)
+      // console.log("Taking snapshot of " + data.fxn)
 
       out.shift() // amend start of macro
       const user_wave_num = data.fxn.charAt(5)
@@ -914,11 +1027,23 @@ function widget(data) {
     }
   }
 
-  function send_cmd(cmd) {
-    if (the_macro.is_recording() && cmd !== "\n") {
-      the_macro.append(cmd)
+  function send_cmd(cmd, force = false) {
+    if (op_mode === OP_MODE_NORMAL || force) {
+      if (the_macro.is_recording() && cmd !== "\n") {
+        the_macro.append(cmd)
+      }
+      the_queue.enqueue(cmd)
     }
-    the_queue.enqueue(cmd)
+  }
+
+  function send_waveform() {
+    const selected_index = $(`input[name=p1]`).val()
+    let s = `w${selected_index},`
+    waveform_data.forEach(function (value, index) {
+      if (index > 0) s += ","
+      s += value
+    })
+    send_cmd(s, true)
   }
 
   function refresh_screen() {
