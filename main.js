@@ -19,7 +19,7 @@ async function createWindow() {
       nodeIntegration: true, // is default value after Electron v5
       contextIsolation: false, // protect against prototype pollution
       enableRemoteModule: false, // turn on remote
-      // preload: path.join(__dirname, "preload.js") // use a preload script
+      preload: path.join(__dirname, "preload.js"), // use a preload script
       // preload: path.join(app.getAppPath(), 'preload.js')
     },
   })
@@ -29,7 +29,7 @@ async function createWindow() {
 
   // rest of code..
   // Open the DevTools.
-  // win.webContents.openDevTools()
+  win.webContents.openDevTools()
 
   // Emitted when the window is closed.
   win.on("closed", function () {
