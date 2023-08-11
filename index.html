@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' ; script-src 'self' " />
-    <title>Bonkulator Control Panel v1.1</title>
+    <title>Bonkulator Control Panel v2.0</title>
     <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
 
     <link rel="stylesheet" href="css/cp.css" type="text/css" media="all" />
@@ -19,6 +19,10 @@
         <h1>Welcome to the Bonkulator Control Panel</h1>
         <h2>Please Choose a Port</h2>
         <div id="ports_table"></div>
+        <div id="chrome-version">Chrome ver: </div>
+        <div id="electron-version">Electron ver: </div>
+        <div id="node-version">Node ver: </div>
+        <div id="serialport-version">Serialport ver: </div>
     </div>
     <div id="control_div">
         <div id="head_div">
@@ -95,7 +99,13 @@
                         </div>
                     </div>
                     <div id="activate_controls">
-                        <button id="activate_button">Activate</button>
+                        <button id="activate_button" class="controls_button">Activate</button>
+                    </div>
+                    <div id="draw_controls">
+                        <button id="draw_button" class="controls_button">Draw Waveform</button>
+                    </div>
+                    <div id="cancel_draw_controls">
+                        <button id="cancel_draw_button" class="controls_button">Cancel Draw Waveform</button>
                     </div>
                 </div>
             </div>
@@ -195,6 +205,9 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div id="busy_div">
+        <div><img src="img/loading.gif" /><br />Please Wait</div>
     </div>
 </body>
 
