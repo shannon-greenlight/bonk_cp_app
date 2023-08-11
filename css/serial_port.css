@@ -9,11 +9,13 @@
 
 #ports {
   font-size: 0.85em;
+  margin-left: 20px;
+  background-color: #ffffff;
 }
 
 #ports table {
   border: 2px solid;
-  margin: 10px 10px 10px 20px;
+  margin: 10px 10px 10px 0px;
   width: 650px;
 }
 
@@ -31,14 +33,14 @@
   /* font-size: 1.2em; */
   margin-bottom: 0;
   margin-top: 20px;
-  padding-left: 20px;
+  padding-left: 0px;
 }
 
 #ports h2 {
   /* font-size: 1.2em; */
   margin-bottom: 0;
   margin-top: 10px;
-  padding: 0 0 0 20px;
+  padding: 0 0 0 0px;
 }
 
 #ports td:first-child {
