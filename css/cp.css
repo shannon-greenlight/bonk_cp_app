@@ -61,11 +61,7 @@ input {
   min-height: 967px;
   border: 1px solid #555;
   background-color: var(--app_background);
-  background-image: linear-gradient(
-    to bottom,
-    var(--gradient_from),
-    var(--gradient_to)
-  );
+  background-image: linear-gradient(to bottom, var(--gradient_from), var(--gradient_to));
   /*background-image: linear-gradient(to bottom, #cfaa7c, #cfaa7c);*/
   /*background-color: #cfc7c0;*/
   /*background-image: linear-gradient(to bottom, #997780, #f7dde0);*/
@@ -143,8 +139,7 @@ strong {
   grid-column: 3 / span 2;
 }
 
-#macro_buttons .cmd_button,
-#snapshot_button_div .cmd_button {
+.cmd_button {
   background-color: #444444;
   color: #aaaaaa;
   padding: 5px;
@@ -154,15 +149,13 @@ strong {
   cursor: pointer;
 }
 
-#macro_buttons .cmd_button:disabled,
-#snapshot_button_div .cmd_button:disabled {
+.cmd_button:disabled {
   background-color: #888;
   cursor: default;
 }
 
-#macro_buttons .cmd_button:disabled:hover,
-#snapshot_button_div .cmd_button:disabled:hover {
-  color: #aaaaaa;
+.cmd_button:disabled:hover {
+  color: #aaaaaa !important;
 }
 
 #macro_buttons .cmd_button:hover,
@@ -211,8 +204,8 @@ strong {
 #display_div button:disabled {
   border: 1px solid;
   border-radius: 4px;
-  background-color: #ddd;
-  color: #aaa;
+  background-color: #ddd !important;
+  color: #aaa !important;
   cursor: default;
 }
 
@@ -291,8 +284,15 @@ strong {
   width: 411px;
 }
 
-#activate_controls {
+#activate_controls,
+#draw_controls,
+#cancel_draw_controls {
   width: 100%;
+}
+
+#draw_controls,
+#cancel_draw_controls {
+  display: none;
 }
 
 #trigger_controls,
@@ -468,23 +468,27 @@ label[for="macro"] {
   row-gap: 25px;
 }
 
-#activate_button {
-  /* position: absolute;
-        right: 0px;
-        bottom: -60px; */
-  display: none;
-  background-color: #ed1c1c !important;
-  color: #ffffff !important;
+#draw_button,
+#cancel_draw_button {
+  margin-top: 10px;
 }
 
 #fxn_buttons button,
-#activate_button {
+#activate_button,
+#draw_button,
+#cancel_draw_button {
   background-color: #444444;
   color: #aaaaaa;
   padding: 5px;
   font-size: 0.75em;
   width: inherit !important;
   border: 1px dotted;
+}
+
+#activate_button {
+  display: none;
+  background-color: #ed1c1c;
+  color: #ffffff;
 }
 
 #fxn_buttons button.selected,
@@ -495,6 +499,7 @@ label[for="macro"] {
   font-size: 0.9em;
 }
 
+.controls_button:disabled,
 #fxn_buttons button:disabled {
   background-color: transparent;
   color: #aaa;
@@ -616,8 +621,41 @@ label[for="macro"] {
   font-size: 14px;
 }
 
+#message_div h2 {
+  text-align: center;
+}
+
+.big_message {
+  position: relative !important;
+  height: 300px;
+}
+
+#busy_div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  width: 1100px;
+  min-height: 967px;
+  background-color: #474444;
+  font-size: 2em;
+  opacity: 0;
+}
+
+#busy_div div {
+  width: 250px;
+  background-color: rgb(199, 201, 187);
+  border-radius: 15px;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+  border: 4px solid;
+}
+
 #canvas {
   /*border: 1px dashed;*/
+  cursor: pointer;
 }
 
 .slider_input_div {
