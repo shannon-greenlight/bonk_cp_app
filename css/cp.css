@@ -456,11 +456,6 @@ label[for="macro"] {
   background-color: transparent;
 }
 
-/* #fxn_label {
-        position: absolute;
-        right: 75px;
-    } */
-
 #fxn_buttons {
   /*margin-bottom: 5px;*/
   display: grid;

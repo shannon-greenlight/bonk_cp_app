@@ -1,3 +1,5 @@
+$ = jQuery
+
 let dbugger = {
   debug_on: false,
   print: function (s, force) {
@@ -7,81 +9,10 @@ let dbugger = {
   },
 }
 
-const OP_MODE_NORMAL = 0
-const OP_MODE_DRAW = 1
-let op_mode = OP_MODE_NORMAL // normal, draw
+waveform_obj.init()
 
-const DRAW_MODE_OFF = 0
-const DRAW_MODE_ON = 1
-let draw_mode = DRAW_MODE_OFF
-document.body.onmouseup = function () {
-  draw_mode = DRAW_MODE_OFF
-}
+let the_macro
 
-$ = jQuery
-const meas_div = $("#meas_div")
-const the_canvas = $("#canvas")
-let waveform_data
-
-let user_waveform_obj = {
-  c: 0,
-  ctx: 0,
-  wave_arr: [],
-  wave_arr_length: 0,
-  cwidth: 0,
-  cheight: 0,
-  calc_w: function (i) {
-    return parseInt((i / this.wave_arr_length) * this.cwidth, 10)
-  },
-  calc_h: function (i) {
-    return this.cheight - parseInt((this.wave_arr[i] / data.dac_fs) * (this.cheight - 2), 10) - 2
-  },
-  set_variables: function () {
-    this.c = document.getElementById("canvas")
-    this.ctx = this.c.getContext("2d")
-    this.wave_arr = waveform_data
-    this.wave_arr_length = this.wave_arr.length
-    this.cwidth = the_canvas.width()
-    this.cheight = the_canvas.height()
-  },
-  // draw index indicator if in User Waveforms
-  draw_index: function () {
-    this.set_variables()
-    // const wave_index = parseInt(data.params[0][1].value) + 1
-    // const wave_index = parseInt($(`input[name=p1]`).parent().find("div.param_body").html())
-    const wave_index = parseInt($(`input[name=p1]`).val())
-    console.log(`Wave index: ${wave_index}`)
-    if (data.fxn.indexOf("User") === 0) {
-      // this.ctx = this.c.getContext("2d")
-      this.ctx.beginPath()
-      this.ctx.strokeStyle = "#FF0000"
-      this.ctx.moveTo(this.calc_w(wave_index), this.calc_h(wave_index))
-      this.ctx.arc(this.calc_w(wave_index), this.calc_h(wave_index), 2, 0, 2 * Math.PI)
-      this.ctx.stroke()
-    }
-  },
-  draw_waveform: function () {
-    this.set_variables()
-    let self = this
-    // console.log(self.wave_arr)
-    self.ctx.beginPath()
-    self.ctx.clearRect(0, 0, self.cwidth, self.cheight)
-    self.ctx.strokeStyle = "#000000"
-    // console.log(ctx);
-    self.ctx.moveTo(0, self.calc_h(0))
-    for (i = 0; i < self.wave_arr_length; i++) {
-      self.ctx.lineTo(self.calc_w(i), self.calc_h(i))
-    }
-    self.ctx.stroke()
-    self.draw_index()
-  },
-}
-
-// user_waveform_obj.c = document.getElementById("canvas")
-// user_waveform_obj.ctx = user_waveform_obj.c.getContext("2d")
-
-// const out_fs = 128 / 12;
-// const out_fs = 5.463*2;
 let out_fs = 0
 let out_offset = 0
 const zeroPad = (num, places) => {
@@ -125,6 +56,7 @@ function display_param(data) {
       break
     case "sequence":
       dbugger.print(data)
+      dbugger.print(`Data val: ${data_value}`, false)
       if (data.dig_num > data_value.length - 1) data_value += " "
       let dval = data_value
       tail = dval.slice(parseInt(data.dig_num) + 1)
@@ -266,8 +198,6 @@ function widget(data) {
   } else {
     out_offset = out_fs / 2
   }
-  // const meas_div = $("#meas_div")
-  // const the_canvas = $("#canvas")
 
   let title = $("#head_div img").attr("title").toString()
   title = title.replace("Spanky", data.device_name)
@@ -308,15 +238,15 @@ function widget(data) {
   // $("#analog_label").html(data.quantized)
 
   if (data.message) {
-    console.log(data.fxn)
-    console.log(data.message)
+    // console.log(data.fxn)
+    // console.log(data.message)
     if (data.fxn === "WiFi") {
       $("#message_div").html(data.message).addClass("big_message")
     } else {
       $("#message_div").html("").removeClass("big_message")
       waveform_data = data.message.split(", ")
       setTimeout(function () {
-        user_waveform_obj.draw_waveform()
+        waveform_obj.draw_waveform()
         the_canvas.show()
       }, canvas_delay)
     }
@@ -430,14 +360,6 @@ function widget(data) {
         "disabled",
         param_val.indexOf("CV") === 0
       )
-      // if (param_val.indexOf("CV") === 0) {
-      //   console.log(`${search_label} at index ${param_index} value: ${param_val} Disabled!`)
-      //   console.log(`#adj_div input#${search_id}, #adj_div input#${search_id}_slider`)
-      //   $(`#adj_div input[id="${search_id}"], #adj_div input[id="${search_id}_slider"]`).prop(
-      //     "disabled",
-      //     true
-      //   )
-      // }
     }
   }
 
@@ -445,10 +367,6 @@ function widget(data) {
   set_adj("Offset: ", "offset")
   set_adj("Randomness: ", "randomness")
   set_adj("Idle Value: ", "Idle Value")
-
-  // console.log(`Offset index: ${param_index}  value: ${param_val}`)
-
-  // console.log(param_index)
 
   //$("#cv_val, #cv_val_slider").prop("disabled", data.fxn==="LFO");
 
@@ -463,7 +381,7 @@ function widget(data) {
     selected_data = null
   }
   if (selected_data) {
-    console.log("Selected: ", selected_data)
+    // console.log("Selected: ", selected_data)
     //let selected_data=data.params[0][data.param_num];
     //let selected_param= $($("#params .param_div input[component]")[data.param_num]);
     let selected_param = $("#params .param_div .selected input")
@@ -554,12 +472,8 @@ function widget(data) {
   $("#canvas").on("mousemove", function (e) {
     const selected_index = parseInt((e.offsetX * 128) / $(this).width())
     const selected_value = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
-    if (draw_mode === DRAW_MODE_ON && op_mode === OP_MODE_DRAW) {
-      console.log(`Index: ${selected_index} Value: ${selected_value}`)
-      $(`input[name=p1]`).val(selected_index).parent().find("div.param_body").html(selected_index)
-      $(`input[name=p2]`).parent().find("div.param_body").html(selected_value)
-      waveform_data[selected_index] = selected_value
-      user_waveform_obj.draw_waveform()
+    if (waveform_obj.is_drawing()) {
+      waveform_obj.on_mousemove(selected_index, selected_value)
     } else {
       let title
       switch (selected_data.param_num) {
@@ -580,7 +494,7 @@ function widget(data) {
   })
 
   $("#canvas").on("click", function (e) {
-    if (op_mode !== OP_MODE_DRAW) {
+    if (!waveform_obj.in_draw_mode()) {
       if (!isNaN(selected_param)) {
         // console.log("On click")
         $(`input[name=p${selected_data.param_num}]`).val(selected_param)
@@ -598,44 +512,11 @@ function widget(data) {
     }
   })
 
-  $("#canvas").on("mousedown", function (e) {
-    draw_mode = DRAW_MODE_ON
-  })
-
-  $("#canvas").on("mouseup", function (e) {
-    draw_mode = DRAW_MODE_OFF
-  })
-
   $("#activate_button").on("click", function () {
     send_cmd("!")
   })
 
-  function tog_drawing(o) {
-    op_mode = op_mode === OP_MODE_DRAW ? OP_MODE_NORMAL : OP_MODE_DRAW
-    $(
-      "#fxn_buttons .cmd_button, #param_box, #param_box select, #param_box button, #param_box input"
-    ).prop("disabled", op_mode === OP_MODE_DRAW)
-    $("#param_value input").css("display", op_mode === OP_MODE_DRAW ? "none" : "inline-block")
-    $("#activate_button").fadeTo(500, op_mode === OP_MODE_DRAW ? 0 : 100)
-    $("#cancel_draw_controls").toggle()
-    $("#cancel_draw_button").fadeTo(500, op_mode === OP_MODE_DRAW ? 100 : 0)
-    $("#draw_button").html(op_mode === OP_MODE_DRAW ? "Save Drawing" : "Draw Waveform")
-    $("#message_div").html(op_mode === OP_MODE_DRAW ? "Draw slowly in any direction" : "")
-  }
-
-  $("#cancel_draw_button").on("click", function () {
-    tog_drawing($(this))
-    refresh_screen()
-  })
-
-  $("#draw_button").on("click", function () {
-    tog_drawing($(this))
-    // $(this).html(op_mode === OP_MODE_DRAW ? "Stop Drawing" : "Draw Waveform")
-    if (op_mode === OP_MODE_NORMAL) send_waveform()
-  })
-
   $("#take_snapshot").on("click", function () {
-    // $("#snapshot_text").html(snapshot);
     the_macro.put(snapshot)
   })
 
@@ -787,7 +668,7 @@ function widget(data) {
   }
 
   // macros
-  let the_macro = {
+  the_macro = {
     state: "IDLE",
     recorded_macro: [],
     macro_elem: $("#macro"),
@@ -917,27 +798,6 @@ function widget(data) {
   the_macro.init()
   the_macro.set_buttons()
 
-  const the_queue = {
-    queue: [],
-    busy: false,
-    enqueue: function (item) {
-      this.queue.push(item)
-    },
-    dequeue: function () {
-      if (this.busy) {
-        console.log("Hey, I'm busy!")
-      } else {
-        return this.queue.shift()
-      }
-    },
-    data_available: function () {
-      return this.queue.length > 0 && !this.busy
-    },
-    debug: function () {
-      console.log(this.queue)
-    },
-  }
-
   function take_snapshot(data) {
     // todo capture all user data
     // console.log("Snapshot data", data)
@@ -1025,29 +885,6 @@ function widget(data) {
       console.log(e)
       data.err = e
     }
-  }
-
-  function send_cmd(cmd, force = false) {
-    if (op_mode === OP_MODE_NORMAL || force) {
-      if (the_macro.is_recording() && cmd !== "\n") {
-        the_macro.append(cmd)
-      }
-      the_queue.enqueue(cmd)
-    }
-  }
-
-  function send_waveform() {
-    const selected_index = $(`input[name=p1]`).val()
-    let s = `w${selected_index},`
-    waveform_data.forEach(function (value, index) {
-      if (index > 0) s += ","
-      s += value
-    })
-    send_cmd(s, true)
-  }
-
-  function refresh_screen() {
-    send_cmd("\n")
   }
 
   $("#refresh_button").on("click", function () {
