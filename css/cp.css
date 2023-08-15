@@ -29,9 +29,9 @@ h3 {
   font-family: PermanentMarker, sans-serif;
 }
 
-#refresh_button {
+/* #refresh_button {
   display: none;
-}
+} */
 
 .entry-content {
   /*height: 975px;*/
@@ -250,6 +250,10 @@ strong {
   width: 125px !important;
 }
 
+#params {
+  min-height: 230px;
+}
+
 #params,
 #param_buttons {
   padding-top: 10px;
@@ -304,16 +308,6 @@ strong {
   padding-top: 5px;
   padding-left: 5px;
   padding-right: 5px;
-}
-
-#trigger_buttons {
-  /* height: 343px; */
-  padding-top: 40px;
-  display: grid;
-  justify-content: left;
-  grid-template-columns: 1fr 1fr 4fr;
-  grid-template-rows: auto auto auto auto;
-  grid-row-gap: 62px;
 }
 
 #trigger_buttons button {
@@ -517,63 +511,6 @@ label[for="macro"] {
   text-transform: capitalize;
 }
 
-.tog_label {
-  font-weight: bold;
-  /*text-align: center;*/
-}
-
-.outputs {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  justify-content: center;
-  grid-column-gap: 5px;
-  align-content: center;
-  margin-top: -3px;
-  font-family: "Courier New", Courier, serif;
-  cursor: pointer;
-}
-
-.outputs div {
-  background-color: #c3baba;
-  font-size: 0.6em;
-  padding-top: 3px;
-  text-align: center;
-  border-radius: 7px;
-  border: 1px dotted;
-}
-
-#outputs0 div.selected {
-  background-color: #6d6;
-}
-
-#outputs1 div.selected {
-  background-color: #66d;
-}
-
-#outputs2 div.selected {
-  background-color: #dd6;
-}
-
-#outputs3 div.selected {
-  background-color: #d66;
-}
-
-#t0 {
-  background-color: green;
-}
-
-#t1 {
-  background-color: blue;
-}
-
-#t2 {
-  background-color: yellow;
-}
-
-#t3 {
-  background-color: red;
-}
-
 .led_button {
   width: 25px !important;
 }
@@ -591,13 +528,6 @@ label[for="macro"] {
   margin-bottom: 0px;
 }
 
-.lighted_button {
-  height: 25px;
-  border: 2px solid #666;
-  border-radius: 25px;
-  margin-top: -3px;
-}
-
 .lighted_button:hover {
   border-color: #a0b0a1;
 }
@@ -608,12 +538,16 @@ label[for="macro"] {
 
 #meas_div {
   position: relative;
+  text-align: center;
+  min-height: 40px;
 }
 
 #message_div {
   position: absolute;
   bottom: 0px;
   font-size: 14px;
+  width: 100%;
+  text-align: left;
 }
 
 #message_div h2 {
@@ -623,6 +557,8 @@ label[for="macro"] {
 .big_message {
   position: relative !important;
   height: 300px;
+  /* font-size: 2.5rem; */
+  text-align: center !important;
 }
 
 #busy_div {
@@ -648,11 +584,6 @@ label[for="macro"] {
   border: 4px solid;
 }
 
-#canvas {
-  /*border: 1px dashed;*/
-  cursor: pointer;
-}
-
 .slider_input_div {
   display: flex;
   align-items: baseline;
@@ -663,16 +594,6 @@ label[for="macro"] {
 .slider_input_div input:hover {
   background-color: #c4bcb5;
   border: 1px solid #a09e9e;
-}
-
-.slider_input_div input,
-.slider_input_div input:disabled {
-  width: 55px !important;
-  text-align: right;
-  margin-left: 5px !;
-  background-color: transparent !important;
-  border: 1px solid transparent !important;
-  padding: 0 !important;
 }
 
 .slider_input_div input:disabled {

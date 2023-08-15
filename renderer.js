@@ -1,221 +1,40 @@
 $ = jQuery
 
-let dbugger = {
-  debug_on: false,
-  print: function (s, force) {
-    if (this.debug_on || force) {
-      console.log(s)
-    }
-  },
-}
-
 waveform_obj.init()
 
-let the_macro
-
+let snapshot = ""
 let out_fs = 0
 let out_offset = 0
-const zeroPad = (num, places) => {
-  return String(num).padStart(places, "0")
-}
 let cmd_buttons
 let legal_values
 const cv_offset = 5.4
-let data = {}
 
-function display_param(data) {
-  // console.log(data);
-  const param_num = data.param_num
-  let data_value = data.value
-  let tail
-  const is_selected = data.selected === "true"
-  const selected_class = is_selected ? " selected" : ""
-  let control = "<div class='param_div" + selected_class + "' >"
-  control += " <div class='param param_head'><label>" + data.label + "</label></div>"
-  control += " <div class='param param_val " + data.type + selected_class + "'>"
-  switch (data.type) {
-    case "radio":
-      let values = data.values.split(",")
-      let input_name = `p${param_num}`
-      for (let i = 0; i < values.length; i++) {
-        control += " <div class='param'>"
-        control += "<input name='" + input_name + "'"
-        control += ` class="cmd_button" title="${i}" data-ref="${i}" `
-        control += ' type="radio"'
-        // this prevents radio button from jumping around
-        if (data.cmd === "p") {
-          if ($(`input[name=${input_name}][value=${i}]:checked`).length) control += " checked "
-        } else {
-          if (data.value === values[i]) control += " checked "
-        }
-        control += ' value="' + i + '" />'
-        control += "<label for='" + values[i] + "' >" + values[i] + "</label>"
-        control += "</div>" // closes .param
-      }
-      control += "<div class='clear' /></div>" // closes .param_val
-      break
-    case "sequence":
-      dbugger.print(data)
-      dbugger.print(`Data val: ${data_value}`, false)
-      if (data.dig_num > data_value.length - 1) data_value += " "
-      let dval = data_value
-      tail = dval.slice(parseInt(data.dig_num) + 1)
-      let hilight = param_num == "1" ? "hilight_emphasize" : "hilight"
-      //control += " <div class='"+data.type+"'>";
-      control += "<input"
-      control += ' name="s"'
-      control += ' type="hidden"'
-      control += ' value="' + data_value + '" />'
-      control += "<div>"
-      control += dval.slice(0, data.dig_num)
-      control += `<span class="${hilight}">${dval.substr(data.dig_num, 1)}</span>${tail}</div>`
-      control += "</div>"
-      break
-    default:
-      control += "<input name='p" + param_num + "'"
-      control += ' type="hidden"'
-      control += ' min="' + data.min + '"'
-      control += ' max="' + data.max + '"'
-      control += ' component="' + data.type + '"'
-      // if (data.selected==="false") control += " disabled";
-      control += ' value="' + data.value + '" />'
-
-      control += "<div class='param_body'>"
-      let n = data_value
-      let plussign = data.dp > 0 || data.min < 0 ? "+" : " "
-      plussign = data.value < 0 ? "-" : plussign
-      if (data.type === "number") {
-        if (data.dp === "0") {
-          n = zeroPad(Math.abs(data_value), data.num_digits)
-        } else {
-          dbugger.print(`Data Value: ${data_value}`, false)
-          dbugger.print(`dig_num: ${data.dig_num}`, false)
-          // n = data_value<0 ? "-" : "+"
-          let divisor = Math.pow(10, data.dp)
-          let int_part = Math.floor(Math.abs(data_value) / divisor)
-          if (data.max >= 10000) {
-            int_part = zeroPad(int_part, 2)
-            if (data.dig_num > 0) data.dig_num--
-            dbugger.print(`dig_num2: ${data.dig_num}`, false)
-          }
-          let frac_part = zeroPad(Math.abs(data_value) % divisor, data.dp)
-          n = int_part.toString()
-          n += "."
-          n += frac_part
-          dbugger.print(`n: ${n}`, false)
-        }
-      } else {
-        plussign = ""
-      }
-      dbugger.print(`n: ${n}`, false)
-      if (data.selected === "true" && (data.type === "number" || data.type === "text")) {
-        tail = n.slice(parseInt(data.dig_num) + 1)
-        control += plussign
-        control += n.slice(0, data.dig_num)
-        control +=
-          "<span class='hilight'>" +
-          n.substr(data.dig_num, 1) +
-          "</span>" +
-          tail +
-          "</div><!-- end param_body -->"
-      } else {
-        control += plussign + n + "</div><!-- end param_body -->"
-      }
-
-      control += "</div>"
-  }
-  control += " <div class='clear' /> <!-- clear param -->"
-  control += "</div></div>" // closes #param_div
-  return control
-}
-
-function display_input(data) {
-  dbugger.print(data)
-  let data_value = data.value
-  let control = ""
-  let values
-  switch (data.type) {
-    case "select": // really select, needs change to arduino code first
-      values = data.values.split(",")
-      if (values.length > 1) {
-        control += "<select id='param_input' name='p" + data.param_num + "'>"
-        //control += " <div class='param  param_val "+data.type+"'>";
-        for (let i = 0; i < values.length; i++) {
-          control += "<option "
-          if (data.value === values[i]) control += " selected "
-          control += ' value="' + i + '">' + values[i] + "</option>"
-        }
-        control += "</select>"
-      }
-      break
-    case "sequence":
-      data_value = data.value
-      control += "<input"
-      control += ' id="param_input"'
-      control += ' type="text"'
-      control += ' pattern="[' + data.legal_values + ']"'
-      control += ' class="sequence"'
-      control += ' value="' + data.value + '" />'
-      break
-    case "number":
-      control += "<input name='p" + data.param_num + "'"
-      control += ' id="param_input"'
-      control += ' type="number"'
-      control += ' min="' + data.min + '"'
-      control += ' max="' + data.max + '"'
-      control += ' value="' + data.value + '" />'
-      break
-    case "text":
-      control += "<input name='p" + data.param_num + "'"
-      control += ' id="param_input"'
-      control += ' type="text"'
-      control += ' class="text_input"'
-      control += ' value="' + data.value + '" />'
-      break
-  }
-  return control
-}
-
-function fxn_button(data, i) {
-  let fxn = data.fxns[i]
-  let selected = data.fxn === fxn ? "selected " : ""
-  //console.log(fxn,i,selected);
-  let out = `<button id="fxn_button_${i}" title="f${i}" class="${selected}cmd_button" data-ref="f${i}">${fxn}</button>`
-  return out
-}
+const zeroPad = (num, places) => String(num).padStart(places, "0")
 
 let selected_data, selected_param
-function widget(data) {
+function widget() {
   $ = jQuery
-  const bonk_title = `Hi! I'm ${data.device_name}, your Bonkulator and this is my Control Panel.
- You can do lots of things through this interface that you can't do from the front panel.
- And you don't have to wade through patch cords to get to the controls.`
-  $("#head_div img").attr("title", bonk_title)
-  out_fs = data.fs_volts / 1000
-  // out_fs = 10.666
-  if (data.fs_offset == 1) {
-    out_offset = 0 // output is unipolar
-  } else {
-    out_offset = out_fs / 2
-  }
-
-  let title = $("#head_div img").attr("title").toString()
-  title = title.replace("Spanky", data.device_name)
-  dbugger.print(title, false)
-  $("#head_div img").attr("title", title)
-  $("#device_name").html(`"${data.device_name.trim()}"`)
-  // $("#spank_fxn").html("<span class='fxn_head'> "+data.fxn+"</span>");
-  $("#param_label").html(data.fxn)
-  $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
+  data_handler.render_device_name()
 
   const activate_button = $("#activate_button")
-  if (data.param_active == "1") {
+  if (data_handler.param_is_active()) {
     activate_button.fadeIn()
   } else {
     activate_button.fadeOut()
   }
 
-  data.triggers.forEach(function (item, index, arr) {
+  out_fs = data_handler.data.fs_volts / 1000
+  // out_fs = 10.666
+  if (data_handler.data.fs_offset == 1) {
+    out_offset = 0 // output is unipolar
+  } else {
+    out_offset = out_fs / 2
+  }
+
+  $("#param_label").html(data_handler.data.fxn)
+  $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
+
+  data_handler.data.triggers.forEach(function (item, index, arr) {
     let debug = false
     // disable unselected triggers
     $(`#t${item.trig_num}`).attr("disabled", parseInt(item.outputs) === 0)
@@ -235,28 +54,21 @@ function widget(data) {
     }
   })
 
-  // $("#analog_label").html(data.quantized)
-
-  if (data.message) {
-    // console.log(data.fxn)
-    // console.log(data.message)
-    if (data.fxn === "WiFi") {
-      $("#message_div").html(data.message).addClass("big_message")
+  if (data_handler.data.message) {
+    meas_div.show()
+    if (data_handler.data.fxn === "WiFi") {
+      $("#message_div").html(data_handler.data.message).addClass("big_message")
     } else {
       $("#message_div").html("").removeClass("big_message")
-      waveform_data = data.message.split(", ")
-      setTimeout(function () {
-        waveform_obj.draw_waveform()
-        the_canvas.show()
-      }, canvas_delay)
+      the_canvas.show()
+      waveform_obj.draw_waveform()
     }
-    meas_div.show()
   } else {
     the_canvas.hide()
     meas_div.hide()
   }
 
-  switch (data.fxn) {
+  switch (data_handler.data.fxn) {
     case "Settings":
       $("#adj_controls, #trigger_controls").hide()
       break
@@ -264,7 +76,7 @@ function widget(data) {
       meas_div.css({ "text-align": "center" })
       $("#adj_controls, #trigger_controls").show()
   }
-  if (data.in_user_waveforms()) {
+  if (bonk_obj.in_user_waveforms()) {
     $("#adj_controls, #trigger_controls").hide()
     $("#draw_controls").show()
   } else {
@@ -272,33 +84,24 @@ function widget(data) {
   }
 
   let controls = ""
-  let param_set = 0 // only one param set
-  if (data.params[param_set]) {
-    for (let i = 0; i < data.params[param_set].length; i++) {
-      data.params[param_set][i].dig_num = data.digit_num
-      data.params[param_set][i].cmd = data.cmd
-      controls += display_param(data.params[param_set][i])
-    }
-  }
-  // controls += display_param({ label: "<span class='hide'>a</span>", type: "param_buttons"})
-  $("#params").html(controls)
-
-  function capitalizeFirstLetter(string) {
-    return string[0].toUpperCase() + string.slice(1)
-  }
+  $("#params").html(data_handler.display_params(controls))
 
   $(".slider_input_div").each(function (indx) {
     let item = $(this).attr("item") // ie. 'scale';
+    function capitalizeFirstLetter(string) {
+      return string[0].toUpperCase() + string.slice(1)
+    }
+
     function find_param(param) {
       dbugger.print(capitalizeFirstLetter(item) + ": ", false)
       return param.label === capitalizeFirstLetter(item) + ": "
     }
 
-    if (data.params[0]) {
-      const res = data.params[0].find(find_param)
+    if (data_handler.data.params[0]) {
+      const res = data_handler.data.params[0].find(find_param)
       if (res) {
-        let item_max = data[$(this).attr("max")]
-        let item_min = data[$(this).attr("min")]
+        let item_max = data_handler.data[$(this).attr("max")]
+        let item_min = data_handler.data[$(this).attr("min")]
         if (item === "Idle Value") {
           item_max = res.max
           item_min = res.min
@@ -310,7 +113,7 @@ function widget(data) {
         const items = $(selector)
         const item_input = $(`[id='${item}']`)
         const item_slider = $(`[id='${item}_slider']`)
-        if (data[item] === "disabled" || res["value"] === "N/A") {
+        if (data_handler.data[item] === "disabled" || res["value"] === "N/A") {
           items.prop("disabled", true)
         } else {
           items.prop("disabled", false).attr("max", item_max).attr("min", item_min)
@@ -350,7 +153,7 @@ function widget(data) {
     let param_index = -1
     let param_val
     try {
-      param_index = data.params[0].find(find_label).param_num
+      param_index = data_handler.data.params[0].find(find_label).param_num
     } catch (e) {
       dbugger.print(`${search_label} not found!`, true)
     }
@@ -368,128 +171,76 @@ function widget(data) {
   set_adj("Randomness: ", "randomness")
   set_adj("Idle Value: ", "Idle Value")
 
-  //$("#cv_val, #cv_val_slider").prop("disabled", data.fxn==="LFO");
+  //$("#cv_val, #cv_val_slider").prop("disabled", data_handler.data.fxn==="LFO");
 
   // now set selected components input control
-  // let selected_data;
-  let is_selected = (param) => {
-    return param.selected === "true"
-  }
-  if (data.params[0]) {
-    selected_data = data.params[0].find(is_selected)
-  } else {
-    selected_data = null
-  }
+  selected_data = data_handler.find_selected_data()
+  // console.log(selected_data)
   if (selected_data) {
-    // console.log("Selected: ", selected_data)
-    //let selected_data=data.params[0][data.param_num];
-    //let selected_param= $($("#params .param_div input[component]")[data.param_num]);
-    let selected_param = $("#params .param_div .selected input")
-    // console.log("Selected param: ",selected_param);
-    // console.log($("div.selected.param"))
-    // let the_input = selected_param.find("input");
-    if (
-      !(
-        selected_data.type === "radio" ||
-        (selected_data.type === "select" && selected_data.values.split(",").length === 1)
-      )
-    ) {
-      // console.log("Component: " +the_input.attr("component"));
-      // console.log("Component: " +selected_data.type);
-      //display_input(selected_data);
-      $("#param_head").html(`<strong>Enter ${selected_data.label}</strong>`)
-      $("#param_value").html(display_input(selected_data))
-      let a = $("#param_value").detach()
-      console.log(a)
-      $("div.selected.param").append(a)
-      switch (selected_param.attr("component")) {
-        case "select":
-          $("#param_value").css("top", 0)
-          break
-        default:
-          dbugger.print(`Component: ${selected_param.attr("component")}`, false)
-      }
-      // $("#param_input").val(selected_param.find("input").val());
-      $("#inc_controls").show()
-    } else {
-      // $("#input_div").hide();
-    }
-    if (data.fxn_num == 8 && data.fxn.indexOf("User") == 0) {
+    set_selected_param(selected_data)
+    $("#canvas").css("cursor", "")
+    if (bonk_obj.in_user_waveforms()) {
       let p_num = selected_data.param_num
       dbugger.print("selected: " + p_num, false)
       let hint
       switch (p_num) {
         case "1":
           hint = "Click on graph to set <em>index</em>"
+          $("#canvas").css("cursor", "pointer")
           break
-        case "2":
+        case "2000":
           hint = "Click on graph to set <em>value</em>"
+          $("#canvas").css("cursor", "pointer")
           break
         default:
           hint = ""
       }
       $("#message_div").html(hint)
     } else {
-      if (data.fxn !== "WiFi") {
+      if (data_handler.data.fxn !== "WiFi") {
         $("#message_div").html("")
       }
     }
   } else {
     $("#input_div, #inc_controls").hide()
   }
-  //console.log(data.fxns);
 
-  if (data.fxns) {
-    let fxns = ""
-    for (let i = 0; i < data.fxns.length; i++) {
-      fxns += fxn_button(data, i)
-    }
-    $("#fxn_buttons").html(fxns)
-    //console.log(fxns);
-    cmd_buttons = $("button[data-ref]")
-  }
-  // $("#control_div button[data-ref]").prop("disabled",false)
-  const num_params = $("#params .param_div").length
-  dbugger.print(`Num params: ${num_params}`, false)
-  $("#param_buttons button").prop("disabled", num_params < 2)
-  const selected_type = $("#param_input").attr("type")
-  $("#lr_buttons button, #inc_controls button").prop(
-    "disabled",
-    (selected_type !== "number" && selected_type !== "text") || $("#param_input").is(":hidden")
-  )
+  data_handler.draw_fxn_buttons()
+
+  set_param_nav_buttons()
 
   if ($("div.param_div label")[15]) $("div.param_div label")[15].innerHTML = "Idle Value: "
   // $("div.param_div label")[15].innerHTML="Idle Value(x1000): "
 }
 
 ;(function ($) {
-  // console.log("Hey there!!!!!");
+  console.log(`Hey ${device.type}`)
   $("div.navigation-top").remove()
-  let snapshot = ""
   cmd_buttons = $("button[data-ref]")
-  let params = $("#params")
 
   $("#canvas").on("mousemove", function (e) {
-    const selected_index = parseInt((e.offsetX * 128) / $(this).width())
-    const selected_value = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
-    if (waveform_obj.is_drawing()) {
-      waveform_obj.on_mousemove(selected_index, selected_value)
-    } else {
-      let title
-      switch (selected_data.param_num) {
-        case "1":
-          selected_param = selected_index
-          title = `Index: ${selected_param}`
-          break
-        case "2":
-          selected_param = selected_value
-          title = `Value: ${selected_param}`
-          break
-        default:
-          selected_param = NaN
-          title = ""
+    if (bonk_obj.in_user_waveforms()) {
+      const selected_index = parseInt((e.offsetX * 128) / $(this).width())
+      const selected_value = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
+      if (waveform_obj.is_drawing()) {
+        waveform_obj.on_mousemove(selected_index, selected_value)
+      } else {
+        let title
+        switch (selected_data.param_num) {
+          case "1":
+            selected_param = selected_index
+            title = `Index: ${selected_param}`
+            break
+          case "2":
+            selected_param = selected_value
+            title = `Value: ${selected_param}`
+            break
+          default:
+            selected_param = NaN
+            title = ""
+        }
+        $(this).attr("title", title)
       }
-      $(this).attr("title", title)
     }
   })
 
@@ -497,12 +248,12 @@ function widget(data) {
     if (!waveform_obj.in_draw_mode()) {
       if (!isNaN(selected_param)) {
         // console.log("On click")
-        $(`input[name=p${selected_data.param_num}]`).val(selected_param)
         switch (selected_data.param_num) {
           case "1":
+            $(`input[name=p${selected_data.param_num}]`).val(selected_param)
             $(`input[name=p1]`).trigger("change")
             break
-          case "2":
+          case "2000":
             $(`input[name=p2]`).trigger("change")
             send_cmd("!")
             break
@@ -518,6 +269,7 @@ function widget(data) {
 
   $("#take_snapshot").on("click", function () {
     the_macro.put(snapshot)
+    console.log(snapshot)
   })
 
   $("#param_ctrl button").on("click", function () {
@@ -539,12 +291,6 @@ function widget(data) {
     send_cmd(`t${trig_num}`)
     // toggle output
     send_cmd(`T2${output_num}`)
-  })
-
-  $("#control_div").on("click", "button[data-ref]", function () {
-    let cmd = $(this).attr("data-ref")
-    $(this).prop("disabled", true)
-    send_cmd(cmd)
   })
 
   $(".slider_input_div").each(function (indx) {
@@ -595,316 +341,7 @@ function widget(data) {
       }
       send_cmd(cmd + Math.round(val))
     })
-    // amend Idle Value legend
   })
 
-  params.on("change", "input", function () {
-    switch ($(this).attr("type")) {
-      case "radio":
-      case "checkbox":
-        dbugger.print("Radio/Checkbox Input changed: " + $(this).val(), false)
-        send_cmd($(this).attr("name"))
-        let cmd = $(this).val()
-        send_cmd(cmd)
-        break
-      default:
-    }
-    // let cmd = $(this).val();
-    // send_cmd(cmd);
-  })
-
-  params.on("click", ".param_val", function () {
-    const selected = $(this).hasClass("selected")
-    let my = $(this).find("input")
-    let my_name = my.attr("name")
-    let my_type = my.attr("type")
-    if (!selected) {
-      send_cmd(my_name)
-    } else {
-      $("#param_value").css("top", 0)
-      if (my_type === "number") {
-      }
-    }
-  })
-
-  let param_changing = false
-  const param_value = $("#params, #adj_div")
-  param_value.on("change focusin", "#param_input, input", function () {
-    dbugger.print("Changin!", false)
-    clearTimeout(timeout)
-    param_changing = true
-  })
-
-  param_value
-    .on("change", "#param_input", function () {
-      dbugger.print("param_value Changin!", false)
-      if ($(this).attr("type") === "text" && !$(this).hasClass("sequence")) {
-        send_cmd("$" + $(this).val())
-      } else {
-        send_cmd($(this).val())
-      }
-      param_changing = false
-    })
-    .on("keypress", "input.sequence", function (e) {
-      // !!! Don't print anything to console in this fxn. Crashes Chrome when entering value
-      // const regexp = new RegExp(`[UDTBCS\\r\\n]`);
-      const regexp = new RegExp(`[${legal_values}\\r\\n]`)
-      var txt = String.fromCharCode(e.which)
-      if (!txt.match(regexp)) {
-        return false
-      }
-    })
-    .on("keypress", "input.text_input", function (e) {
-      // !!! Don't print anything to console in this fxn. Crashes Chrome when entering value
-      const regexp = new RegExp(`[^%#]+`)
-      var txt = String.fromCharCode(e.which)
-      if (!txt.match(regexp)) {
-        return false
-      }
-    })
-
-  async function send_one_cmd(cmd) {
-    await send_cmd(cmd)
-  }
-
-  // macros
-  the_macro = {
-    state: "IDLE",
-    recorded_macro: [],
-    macro_elem: $("#macro"),
-    record_button: $("#rec_macro"),
-    clr_button: $("#clr_macro"),
-    exe_button: $("#exe_macro"),
-    snapshot_button: $("#take_snapshot"),
-    is_recording: function () {
-      return this.state === "REC"
-    },
-    macro_exists: function () {
-      return Array.isArray(this.recorded_macro) && this.recorded_macro.length > 0
-    },
-    set_buttons: function () {
-      this.exe_button.prop("disabled", !this.macro_exists())
-    },
-    set_text: function () {
-      this.macro_elem.val(JSON.stringify(this.recorded_macro))
-    },
-    put: function (val) {
-      try {
-        this.recorded_macro = JSON.parse(val)
-        this.set_text()
-      } catch (e) {
-        dbugger.print("Didn't parse")
-      }
-      this.set_buttons()
-    },
-    clr: function () {
-      dbugger.print("Clr Macro", false)
-      this.put("[]")
-    },
-    append: function (val) {
-      this.recorded_macro.push(val)
-      this.set_text()
-    },
-    put_state: function (state) {
-      this.state = state
-      this.set_buttons()
-      let background_color = ""
-      switch (this.state) {
-        case "IDLE":
-          background_color = ""
-          $("#macro_buttons .indicator").html("&nbsp;").css("background-color", background_color)
-          this.record_button
-            .html("Record")
-            .attr("title", "Click to Start Recording")
-            .css("background-color", "#444444")
-            .prop("disabled", false)
-          this.exe_button.prop("disabled", false)
-          this.snapshot_button.prop("disabled", false)
-          break
-        case "REC":
-          background_color = "#f00"
-          $("#rec_state").html(this.state).css("background-color", background_color)
-          this.exe_button.prop("disabled", true)
-          this.record_button
-            .html("Stop")
-            .attr("title", "Click to Stop Recording")
-            .prop("disabled", false)
-          // .css("background-color", "#888")
-          this.snapshot_button.prop("disabled", true)
-          break
-        case "EXEC":
-          background_color = "#080"
-          $("#play_state").html(this.state).css("background-color", background_color)
-          this.record_button.prop("disabled", true).css("background-color", "#888")
-          this.exe_button.prop("disabled", true)
-          this.snapshot_button.prop("disabled", true)
-          break
-      }
-    },
-    set: function () {
-      this.put_state("REC")
-    },
-    reset: function () {
-      this.put_state("IDLE")
-    },
-    toggle: function () {
-      this.put_state(this.is_recording() ? "IDLE" : "REC")
-    },
-    execute: function () {
-      this.put_state("EXEC")
-      this.clr_button.prop("disabled", true)
-      this.exe_button.prop("disabled", true)
-      let macro = this.macro_elem.val()
-      console.log("Macro: " + macro)
-      let op = ""
-
-      //let parts = macro.split("\n");
-      let parts = this.recorded_macro
-      let i
-      console.log("Parts", parts)
-      for (let i = 0; i < parts.length; i++) {
-        send_cmd(parts[i])
-      }
-      send_cmd("e")
-    },
-    end: function () {
-      //console.log("Ending macro");
-      $("#exe_macro, #clr_macro").prop("disabled", false)
-      this.reset()
-    },
-    init: function () {
-      let self = this
-      this.reset()
-      this.clr()
-      this.clr_button.on("click", function () {
-        self.clr()
-      })
-
-      $("#rec_macro").on("click", function () {
-        self.toggle()
-      })
-
-      this.exe_button.on("click", function (e) {
-        e.preventDefault()
-        self.execute()
-      })
-
-      $("#macro").on("keyup", function () {
-        self.put($(this).val())
-        self.set_buttons()
-      })
-    },
-  }
-  the_macro.init()
-  the_macro.set_buttons()
-
-  function take_snapshot(data) {
-    // todo capture all user data
-    // console.log("Snapshot data", data)
-    let retval = 0
-    let item = ""
-    let out = []
-
-    // if(data.fxns) {
-    //     const fxn = data_in.fxns.indexOf(data.fxn);
-    //     let item=`f${fxn}`;
-    //     out.push(item);
-    // }
-
-    item = `f${data.fxn_num}`
-    out.push(item)
-    if (data.params[0]) {
-      data.params[0].forEach(function (val, indx) {
-        out.push(`p${indx}`)
-        out.push(val.type == "text" ? "$" + val.value : val.numeric_val)
-      })
-    }
-
-    if (data.in_user_waveforms()) {
-      // console.log("Taking snapshot of " + data.fxn)
-
-      out.shift() // amend start of macro
-      const user_wave_num = data.fxn.charAt(5)
-      out.unshift("!")
-      out.unshift(user_wave_num)
-      out.unshift("p6")
-      out.unshift("f8")
-
-      const values = data.message.split(", ")
-      // out.push(`p6`)
-      // out.push(`!`)
-      out.push(`p1`)
-      out.push(`0`)
-      out.push(`p2`)
-      for (const val of values) {
-        out.push(`${val}`)
-        out.push(`!`)
-        // console.log(`"${val}","!",`)
-      }
-    }
-
-    return JSON.stringify(out)
-  }
-
-  receive_data = function (text) {
-    dbugger.print(text, false)
-    try {
-      data = JSON.parse(text)
-    } catch (e) {
-      console.log(e)
-      console.log(text)
-    }
-    // data = text
-    data.in_user_waveforms = function () {
-      return this.fxn_num === "8" && this.fxn.indexOf("User") === 0
-    }
-
-    console.log("Receiving:", data)
-    snapshot = take_snapshot(data)
-    // console.log(snapshot);
-
-    if (data.cmd === "e") {
-      the_macro.end()
-    } else {
-      //if(cmd.substr(0,1)!=="p" && data.fxn) widget(data);
-      if (data.fxn && !param_changing) widget(data)
-      param_changing = false
-    }
-    the_queue.busy = false
-  }
-
-  async function _send_cmd(cmd) {
-    const res = prep_request(cmd)
-    if (res.fail) return
-    cmd = res.cmd
-    the_queue.busy = true
-
-    try {
-      request_data(cmd)
-    } catch (e) {
-      console.log(e)
-      data.err = e
-    }
-  }
-
-  $("#refresh_button").on("click", function () {
-    // $("#control_div").fadeOut(50);
-    refresh_screen()
-  })
-
-  // heartbeat manages the_queue
-  let timeout
-  setInterval(function () {
-    param_changing = false
-    if (the_queue.data_available()) {
-      clearTimeout(timeout)
-      _send_cmd(the_queue.dequeue())
-    } else {
-      if (data.triggered === "ON" && data.fxn === "Bounce") {
-        data.triggered = "OFF"
-        timeout = setTimeout(refresh_screen, 1000)
-      }
-    }
-  }, 250)
   if (typeof url !== "undefined") refresh_screen()
 })(jQuery)

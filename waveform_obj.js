@@ -2,8 +2,6 @@
 const meas_div = $("#meas_div")
 const the_canvas = $("#canvas")
 
-let waveform_data
-
 let waveform_obj = {
   OP_MODE_NORMAL: 0,
   OP_MODE_DRAW: 1,
@@ -23,12 +21,15 @@ let waveform_obj = {
     return parseInt((i / this.wave_arr_length) * this.cwidth, 10)
   },
   calc_h: function (i) {
-    return this.cheight - parseInt((this.wave_arr[i] / data.dac_fs) * (this.cheight - 2), 10) - 2
+    return (
+      this.cheight -
+      parseInt((this.wave_arr[i] / data_handler.data.dac_fs) * (this.cheight - 2), 10) -
+      2
+    )
   },
   set_variables: function () {
     this.c = document.getElementById("canvas")
     this.ctx = this.c.getContext("2d")
-    this.wave_arr = waveform_data
     this.wave_arr_length = this.wave_arr.length
     this.cwidth = the_canvas.width()
     this.cheight = the_canvas.height()
@@ -36,11 +37,9 @@ let waveform_obj = {
   // draw index indicator if in User Waveforms
   draw_index: function () {
     this.set_variables()
-    // const wave_index = parseInt(data.params[0][1].value) + 1
-    // const wave_index = parseInt($(`input[name=p1]`).parent().find("div.param_body").html())
     const wave_index = parseInt($(`input[name=p1]`).val())
-    console.log(`Wave index: ${wave_index}`)
-    if (data.fxn.indexOf("User") === 0) {
+    // console.log(`Wave index: ${wave_index}`)
+    if (data_handler.data.fxn.indexOf("User") === 0) {
       // this.ctx = this.c.getContext("2d")
       this.ctx.beginPath()
       this.ctx.strokeStyle = "#FF0000"
@@ -67,17 +66,18 @@ let waveform_obj = {
   send_waveform: function () {
     const selected_index = $(`input[name=p1]`).val()
     let s = `w${selected_index},`
-    waveform_data.forEach(function (value, index) {
+    this.wave_arr.forEach(function (value, index) {
       if (index > 0) s += ","
       s += value
     })
+    force_use_busy = true
     send_cmd(s, true)
   },
   on_mousemove: function (selected_index, selected_value) {
-    console.log(`Index: ${selected_index} Value: ${selected_value}`)
+    // console.log(`Index: ${selected_index} Value: ${selected_value}`)
     $(`input[name=p1]`).val(selected_index).parent().find("div.param_body").html(selected_index)
     $(`input[name=p2]`).parent().find("div.param_body").html(selected_value)
-    waveform_data[selected_index] = selected_value
+    this.wave_arr[selected_index] = selected_value
     this.draw_waveform()
   },
   draw_mode_on: function () {
@@ -104,6 +104,9 @@ let waveform_obj = {
     $("#cancel_draw_button").fadeTo(500, in_drawmode ? 100 : 0)
     $("#draw_button").html(in_drawmode ? "Save Drawing" : "Draw Waveform")
     $("#message_div").html(in_drawmode ? "Draw slowly in any direction" : "")
+    if (this.in_draw_mode()) {
+      $("#canvas").css("cursor", "pointer")
+    }
   },
   init: function () {
     let self = this

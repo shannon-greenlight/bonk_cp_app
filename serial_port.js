@@ -4,8 +4,7 @@ const { SerialPort, ReadlineParser } = require("serialport")
 const tableify = require("tableify")
 window.$ = window.jQuery = require("jquery")
 
-// const canvas_delay = 1005 // need to wait before drawing
-const canvas_delay = 5 // need to wait before drawing
+const canvas_delay = 1005 // need to wait before drawing
 
 async function listSerialPorts() {
   await SerialPort.list().then((ports, err) => {
@@ -41,8 +40,14 @@ listSerialPorts()
 let chosen_port = "COM1"
 let port
 let parser
+
 let receive_data = function (text) {
   console.log("Receive Data Unset!")
+}
+
+let force_use_busy
+function use_busy() {
+  return device.type === "Bonkulator" && force_use_busy
 }
 
 function prep_request(cmd) {
@@ -51,7 +56,10 @@ function prep_request(cmd) {
   res.cmd = cmd + "\r"
   if (!res.fail) {
     console.log("Sending: " + cmd)
-    $("#busy_div").fadeIn(10)
+    if (use_busy()) {
+      $("#busy_div").fadeIn(10)
+      force_use_busy = false
+    }
   }
   return res
 }
@@ -82,7 +90,7 @@ function request_data(cmd) {
     parser.on("data", function (text) {
       if (text > "") {
         receive_data(text)
-        $("#busy_div").fadeOut(10)
+        if (true || use_busy()) $("#busy_div").fadeOut(10)
       }
     })
     console.log("Timeout: " + listPortsTimeout)
@@ -92,7 +100,7 @@ function request_data(cmd) {
     })
     console.log(chosen_port)
 
-    // request USB Direct mode on Bonkulator
+    // request USB Direct mode
     port.write("U1\r", function (err) {
       if (err) {
         return console.log("Error on write: ", err.message)
