@@ -37,9 +37,10 @@ function widget() {
   data_handler.data.triggers.forEach(function (item, index, arr) {
     let debug = false
     // disable unselected triggers
-    $(`#t${item.trig_num}`).attr("disabled", parseInt(item.outputs) === 0)
+    // console.log(item)
     let outputs = parseInt(item.outputs)
-    dbugger.print(outputs, debug)
+    $(`#t${item.trig_num}`).prop("disabled", outputs === 0)
+    dbugger.print(`#t${item.trig_num}`, debug)
     for (let i = 0; i < 8; i++) {
       // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
       let o = $(`#outputs${index} div:nth-of-type(${i + 1})`)
@@ -205,6 +206,7 @@ function widget() {
     $("#input_div, #inc_controls").hide()
   }
 
+  // $(`#t2`).prop("disabled", true)
   data_handler.draw_fxn_buttons()
 
   set_param_nav_buttons()

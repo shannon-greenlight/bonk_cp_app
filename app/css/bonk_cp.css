@@ -41,24 +41,28 @@
   border: 1px dotted;
 }
 
+#t0,
 #outputs0 div.selected {
   background-color: #6d6;
 }
 
+#t1,
 #outputs1 div.selected {
   background-color: #66d;
 }
 
+#t2,
 #outputs2 div.selected {
   background-color: #dd6;
 }
 
+#t3,
 #outputs3 div.selected {
   background-color: #d66;
 }
 
-#t0 {
-  background-color: green;
+/* #t0 {
+  background-color: #6d6;
 }
 
 #t1 {
@@ -71,7 +75,7 @@
 
 #t3 {
   background-color: red;
-}
+} */
 
 .lighted_button {
   height: 25px;

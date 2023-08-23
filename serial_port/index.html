@@ -4,22 +4,24 @@
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' ; script-src 'self' " />
-    <title>Bonkulator Control Panel v2.0</title>
-    <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+    <title></title>
+    <script type="text/javascript" src="../node_modules/jquery/dist/jquery.min.js"></script>
 
-    <link rel="stylesheet" href="css/cp.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="css/bonk_cp.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="css/serial_port.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-    <link rel="stylesheet" id="twentyseventeen-block-style-css" href="css/blocks.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="../css/cp.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="../app/css/bonk_cp.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="./css/serial_port.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="./css/wordpress/style.css" type="text/css" media="all" />
+    <link rel="stylesheet" id="twentyseventeen-block-style-css" href="./css/wordpress/blocks.css" type="text/css"
+        media="all" />
 </head>
 
 <body>
-    <div id="error"></div>
     <div id="ports">
         <h1>Welcome to the Bonkulator Control Panel</h1>
         <h2>Please Choose a Port</h2>
         <div id="ports_table"></div>
+        <div id="error">&nbsp;</div>
+        <div id="clr_error_div"><button id="clr_error_button">Clear Error</button></div>
         <div id="chrome-version">Chrome ver: </div>
         <div id="electron-version">Electron ver: </div>
         <div id="node-version">Node ver: </div>
@@ -216,15 +218,16 @@
 renderer.js will be executed in the renderer process for index.html.
 All of the Node.js APIs are available in this process.
  -->
-<script src="./bonk_device.js"></script>
-<script src="./dbugger.js"></script>
-<script src="./serial_port.js"></script>
-<script src="./waveform_obj.js"></script>
-<script src="./send_cmd.js"></script>
-<script src="./data_handler.js"></script>
-<script src="./bonk_obj.js"></script>
-<script src="./the_macro.js"></script>
-<script src="./renderer.js"></script>
-<script src="./receive_data.js"></script>
+<script src="../app/bonk_device.js"></script>
+<script src="../js/dbugger.js"></script>
+<script src="../serial_port/serial_port.js"></script>
+<script src="../js/waveform_obj.js"></script>
+<script src="../js/send_cmd.js"></script>
+<script src="../js/data_handler.js"></script>
+<script src="../app/bonk_obj.js"></script>
+<script src="../js/the_macro.js"></script>
+<script src="../app/button.js"></script>
+<script src="../app/renderer.js"></script>
+<script src="../js/receive_data.js"></script>
 
 </html>

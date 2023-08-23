@@ -1,8 +1,15 @@
 let data_handler = {
   data: null,
+  status: null,
+  status_received: false,
   receive_data: function (text) {
-    this.data = JSON.parse(text)
-    waveform_obj.wave_arr = this.get_wave_data()
+    const incoming_data = JSON.parse(text)
+    this.status_received = incoming_data.status
+    if (this.status_received) {
+      this.status = incoming_data
+    } else {
+      this.data = incoming_data
+    }
   },
   display_param: function (data) {
     // console.log(data);
@@ -206,7 +213,13 @@ let data_handler = {
     $("#device_name").html(`"${device_name.trim()}"`)
   },
   get_wave_data: function () {
-    return this.data.message.split(", ")
+    let wave_data
+    try {
+      wave_data = this.data.message.split(", ")
+    } catch (e) {
+      console.log(e)
+    }
+    return wave_data
   },
   param_is_active: function () {
     return this.data.param_active == "1"

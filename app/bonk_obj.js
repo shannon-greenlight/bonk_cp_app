@@ -1,6 +1,6 @@
 let bonk_obj = {
   in_user_waveforms: function () {
-    console.log(data_handler.data)
+    // console.log(data_handler.data)
     return data_handler.data.fxn_num == 8 && data_handler.data.fxn.indexOf("User") == 0
   },
 }

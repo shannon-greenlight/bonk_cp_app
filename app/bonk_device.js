@@ -1,5 +1,7 @@
 device = {
   type: "Bonkulator",
+  title: "Bonkulator Control Panel v3.0",
+  port_label: "USB Serial Device",
   init: function () {
     $("#busy_div").fadeOut(1).css("opacity", 1)
   },
@@ -27,5 +29,17 @@ device = {
       }
     }
     return out
+  },
+  receive_data: function () {
+    t0_button.trigger = data_handler.data.triggers[0]
+    t1_button.trigger = data_handler.data.triggers[1]
+    t2_button.trigger = data_handler.data.triggers[2]
+    t3_button.trigger = data_handler.data.triggers[3]
+  },
+  receive_status: function () {
+    t0_button.set(data_handler.status.t0)
+    t1_button.set(data_handler.status.t1)
+    t2_button.set(data_handler.status.t2)
+    t3_button.set(data_handler.status.t3)
   },
 }

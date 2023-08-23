@@ -19,13 +19,13 @@ async function createWindow() {
       nodeIntegration: true, // is default value after Electron v5
       contextIsolation: false, // protect against prototype pollution
       enableRemoteModule: false, // turn on remote
-      preload: path.join(__dirname, "preload.js"), // use a preload script
+      preload: path.join(__dirname, "serial_port/preload.js"), // use a preload script
       // preload: path.join(app.getAppPath(), 'preload.js')
     },
   })
 
   // Load app
-  win.loadFile(path.join(__dirname, "index.html"))
+  win.loadFile(path.join(__dirname, "serial_port/index.html"))
 
   // rest of code..
   // Open the DevTools.

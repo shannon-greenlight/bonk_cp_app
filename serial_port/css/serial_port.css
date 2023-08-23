@@ -3,22 +3,27 @@
   font-size: 0.85em;
   margin-left: 20px;
   background-color: #ffffff;
+  width: 650px;
 }
 
 #ports table {
-  border: 2px solid;
+  border: 2px solid #333;
   margin: 10px 10px 10px 0px;
-  width: 650px;
 }
 
 #ports table th {
   background-color: #555;
-  color: #ffffff;
+  color: #fff;
 }
 
 #ports table th,
 #ports table td {
   padding-left: 5px;
+  border: 1px dotted #333;
+}
+
+#ports table td {
+  color: #eee;
 }
 
 #ports h1 {
@@ -35,8 +40,17 @@
   padding: 0 0 0 0px;
 }
 
-#ports td:first-child {
+#ports tr {
+  background-color: #aaa;
+}
+
+#ports tr.enable_port {
   cursor: pointer;
+  background-color: #fff;
+}
+
+#ports tr.enable_port td {
+  color: #000;
 }
 
 #ports td:nth-child(2),
@@ -57,6 +71,40 @@
   display: none;
 }
 
+#error {
+  border: 2px solid #555;
+  background-color: #efe4e4;
+  color: red;
+  padding: 1rem;
+  font-size: 1.15rem;
+  font-weight: 400;
+  /* height: 55px; */
+}
+
+#clr_error_div {
+  text-align: right;
+  margin-bottom: 40px;
+}
+
+#clr_error_div button {
+  margin: 0;
+  margin-top: 2px;
+  padding: 5px;
+  background-color: #fff;
+  border: 1px solid #555;
+  color: #333;
+  font-weight: normal;
+  font-size: 14px;
+}
+
+/* .disable_port {
+  background-color: #aaa;
+}
+
+.enable_port {
+  background-color: #cfc;
+}
+ */
 #control_div {
   display: none;
 }

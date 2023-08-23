@@ -129,7 +129,7 @@ param_value
 
 $("#control_div").on("click", "button[data-ref]", function () {
   let cmd = $(this).attr("data-ref")
-  $(this).prop("disabled", true)
+  // $(this).prop("disabled", true)
   send_cmd(cmd)
 })
 
@@ -171,7 +171,7 @@ function set_selected_param(selected_data) {
 }
 
 function set_param_nav_buttons() {
-  $("#control_div button[data-ref]").prop("disabled", false)
+  $("#control_div #param_box button[data-ref]").prop("disabled", false)
   const num_params = $("#params .param_div").length
   dbugger.print(`Num params: ${num_params}`, false)
   $("#param_buttons button").prop("disabled", num_params < 2)
