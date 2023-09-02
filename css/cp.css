@@ -22,6 +22,14 @@ h3 {
   /*margin-top: 15px;*/
 }
 
+#brand {
+  position: absolute;
+  top: 10px;
+  left: 95px;
+  font-size: 1.1rem;
+  color: #444;
+}
+
 #device_name {
   font-size: 2.5rem;
   padding: 0 !important;
@@ -99,7 +107,7 @@ input {
 /*}*/
 
 strong {
-  color: #333 !important;
+  color: #666 !important;
 }
 
 #spank_fxn,
