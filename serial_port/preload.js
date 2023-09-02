@@ -3,10 +3,14 @@
 window.addEventListener("DOMContentLoaded", () => {
   for (const versionType of ["chrome", "electron", "node"]) {
     // console.log(`${versionType}-version`)
-    document.getElementById(`${versionType}-version`).innerText +=
-      process.versions[versionType]
+    document.getElementById(`${versionType}-version`).innerText += process.versions[versionType]
   }
 
-  document.getElementById("serialport-version").innerText +=
-    require("serialport/package").version
+  document.getElementById("serialport-version").innerText += require("serialport/package").version
 })
+
+// const { contextBridge, ipcRenderer } = require("electron")
+
+// contextBridge.exposeInMainWorld("electronAPI", {
+//   handleTitle: (callback) => ipcRenderer.on("handle-title", callback),
+// })

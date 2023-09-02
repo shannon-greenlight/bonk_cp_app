@@ -2,6 +2,7 @@
 
 const { SerialPort, ReadlineParser } = require("serialport")
 const tableify = require("tableify")
+
 window.$ = window.jQuery = require("jquery")
 
 async function listSerialPorts() {
