@@ -11,6 +11,11 @@ const cv_offset = 5.4
 
 const zeroPad = (num, places) => String(num).padStart(places, "0")
 
+// window.electronAPI.handleTitle((event, value) => {
+//   document.title = value
+//   event.sender.send("counter-value", newValue)
+// })
+
 let selected_data, selected_param
 function widget() {
   $ = jQuery
@@ -69,8 +74,8 @@ function widget() {
     meas_div.hide()
   }
 
-  switch (data_handler.data.fxn) {
-    case "Settings":
+  switch (data_handler.data.fxn_num) {
+    case "8":
       $("#adj_controls, #trigger_controls").hide()
       break
     default:
@@ -206,7 +211,6 @@ function widget() {
     $("#input_div, #inc_controls").hide()
   }
 
-  // $(`#t2`).prop("disabled", true)
   data_handler.draw_fxn_buttons()
 
   set_param_nav_buttons()
