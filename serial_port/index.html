@@ -59,6 +59,7 @@
                     <div id="meas_div">
                         <canvas id="canvas" height="200" width="415"></canvas>
                         <div id="message_div"></div>
+                        <div id="system_message_div"></div>
                     </div>
                     <div id="param_box">
                         <div id="params"></div>
@@ -205,6 +206,20 @@
                         <div id="snapshot_button_div">
                             <button id="take_snapshot" class="cmd_button" title="Click to take Snapshot">
                                 Take Snapshot
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="user_waveform_controls">
+                    <label for="macro">User Waveform</label>
+                    <div id="user_waveform_container" class="display_box">
+                        <textarea name="user_waveform" id="user_waveform"></textarea>
+                        <div id="user_waveform_button_div">
+                            <button id="send_waveform" class="cmd_button" title="Click to Send Waveform" disabled>
+                                Send Waveform
+                            </button>
+                            <button id="clr_waveform" class="cmd_button" title="Click to Erase Waveform" disabled>
+                                Erase
                             </button>
                         </div>
                     </div>
