@@ -175,7 +175,7 @@ let data_handler = {
   },
   fxn_button: function (i) {
     let fxn = this.data.fxns[i]
-    let selected = this.data.fxn === fxn ? "selected " : ""
+    let selected = fxn.indexOf(this.data.fxn) === 0 ? "selected " : ""
     //console.log(fxn,i,selected);
     let out = `<button id="fxn_button_${i}" title="f${i}" class="${selected}cmd_button" data-ref="f${i}">${fxn}</button>`
     return out
