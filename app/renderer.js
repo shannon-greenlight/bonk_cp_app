@@ -60,6 +60,17 @@ function widget() {
     }
   })
 
+  the_canvas.hide()
+  meas_div.hide()
+  $("#system_message_div").hide()
+
+  if (data_handler.data.system_message) {
+    meas_div.show()
+    $("#system_message_div").html(data_handler.data.system_message).addClass("big_message").show()
+  } else {
+    // $("#system_message_div").html("").removeClass("big_message")
+  }
+
   if (data_handler.data.message) {
     meas_div.show()
     if (data_handler.data.fxn === "WiFi") {
@@ -70,8 +81,8 @@ function widget() {
       waveform_obj.draw_waveform()
     }
   } else {
-    the_canvas.hide()
-    meas_div.hide()
+    // the_canvas.hide()
+    // meas_div.hide()
   }
 
   switch (data_handler.data.fxn_num) {
@@ -217,6 +228,12 @@ function widget() {
 
   if ($("div.param_div label")[15]) $("div.param_div label")[15].innerHTML = "Idle Value: "
   // $("div.param_div label")[15].innerHTML="Idle Value(x1000): "
+
+  if (bonk_obj.in_user_waveforms()) {
+    $("#user_waveform_controls").show()
+  } else {
+    $("#user_waveform_controls").hide()
+  }
 }
 
 ;(function ($) {
@@ -267,6 +284,20 @@ function widget() {
         }
       }
     }
+  })
+
+  $("#send_waveform").on("click", function () {
+    force_use_busy = true
+    send_cmd($("#user_waveform").val())
+  })
+
+  $("#user_waveform").on("change, keyup", function () {
+    $("#user_waveform_button_div button").prop("disabled", $(this).val() === "")
+  })
+
+  $("#clr_waveform").on("click", function () {
+    $("#user_waveform").val("")
+    $("#user_waveform_button_div button").prop("disabled", true)
   })
 
   $("#activate_button").on("click", function () {

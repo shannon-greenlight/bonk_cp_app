@@ -292,7 +292,8 @@ strong {
   align-content: flex-start;
 }
 
-#macro_controls {
+#macro_controls,
+#user_waveform_controls {
   width: 411px;
 }
 
@@ -417,7 +418,8 @@ strong {
 }
 
 #macro_container,
-#fxn_buttons {
+#fxn_buttons,
+#user_waveform_container {
   max-width: 513px;
 }
 
@@ -436,7 +438,8 @@ strong {
 
 #macro_buttons button,
 #trigger_buttons button,
-#snapshot_button_div button {
+#snapshot_button_div button,
+#user_waveform_button_div button {
   padding: initial !important;
 }
 
@@ -550,7 +553,8 @@ label[for="macro"] {
   min-height: 40px;
 }
 
-#message_div {
+#message_div,
+#system_message_div {
   position: absolute;
   bottom: 0px;
   font-size: 14px;
@@ -558,13 +562,15 @@ label[for="macro"] {
   text-align: left;
 }
 
-#message_div h2 {
+#message_div h2,
+#system_message_div h2 {
   text-align: center;
+  font-size: 2.5rem;
 }
 
 .big_message {
   position: relative !important;
-  height: 300px;
+  height: 200px;
   /* font-size: 2.5rem; */
   text-align: center !important;
 }
@@ -612,7 +618,8 @@ label[for="macro"] {
   text-align: center;
 }
 
-#snapshot_button_div button {
+#snapshot_button_div button,
+#user_waveform_button_div button {
   width: 200px;
   margin-top: 10px;
 }
@@ -653,4 +660,8 @@ label[for="macro"] {
 #param_ctrl button {
   font-size: 0.6em;
   padding: 0.4em;
+}
+
+#user_waveform_controls {
+  display: none;
 }
