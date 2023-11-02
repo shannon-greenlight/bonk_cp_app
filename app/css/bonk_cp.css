@@ -93,3 +93,7 @@
   border: 1px solid transparent !important;
   padding: 0 !important;
 }
+
+.outputs .bounce {
+  display: none;
+}

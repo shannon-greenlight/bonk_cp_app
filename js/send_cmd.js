@@ -93,7 +93,8 @@ params.on("click", ".param_val", function () {
 })
 
 const param_value = $("#params, #adj_div")
-param_value.on("change focusin", "#param_input, input", function () {
+param_value.on("change focusin", "#param_input, input", function (e) {
+  console.log(e.currentTarget.name)
   dbugger.print("Changin!", true)
   clearTimeout(timeout)
   param_changing = true

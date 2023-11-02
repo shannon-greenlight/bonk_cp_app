@@ -39,24 +39,51 @@ function widget() {
   $("#param_label").html(data_handler.data.fxn)
   $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
 
-  data_handler.data.triggers.forEach(function (item, index, arr) {
+  data_handler.data.triggers.forEach(function (trigger, index, arr) {
     let debug = false
     // disable unselected triggers
-    // console.log(item)
-    let outputs = parseInt(item.outputs)
-    $(`#t${item.trig_num}`).prop("disabled", outputs === 0)
-    dbugger.print(`#t${item.trig_num}`, debug)
-    for (let i = 0; i < 8; i++) {
-      // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
-      let o = $(`#outputs${index} div:nth-of-type(${i + 1})`)
-      dbugger.print(`Output: ${o.html()}`, debug)
-      // dbugger.print(parseInt(outputs,2),debug)
-      if (outputs & (0x01 << i)) {
-        o.addClass("selected")
-      } else {
-        o.removeClass("selected")
+    console.log(trigger)
+    if (bonk_obj.in_bounce()) {
+      let inputs = parseInt(trigger.outputs) >> 8
+      let other_input = data_handler.data.fxn === "Bounce 1" ? 1 : 2
+      let selected_input = -1
+      dbugger.print(`Inputs: ${inputs} Other Input: ${other_input}`, false)
+      $(`#t${trigger.trig_num}`).prop("disabled", inputs === 0 || inputs === other_input)
+      dbugger.print(`#t${trigger.trig_num}`, debug)
+      for (let i = 0; i < 2; i++) {
+        // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
+        let o = $(`#outputs${index} div:nth-of-type(${i + 9})`)
+        dbugger.print(`Input: ${o.html()}`, debug)
+        // dbugger.print(parseInt(outputs,2),debug)
+        if (inputs & (0x01 << i)) {
+          o.addClass("selected")
+          selected_input = i
+        } else {
+          o.removeClass("selected")
+        }
+        // outputs = outputs>>1
       }
-      // outputs = outputs>>1
+      if (selected_input > -1) {
+        let disabled_input = (selected_input = 0 ? 1 : 0)
+        $(`#outputs${index} div:nth-of-type(${disabled_input + 9})`).prop("disabled", true)
+        dbugger.print(`Disabled input: ${disabled_input}`, true)
+      }
+    } else {
+      let outputs = parseInt(trigger.outputs) & 0xff
+      $(`#t${trigger.trig_num}`).prop("disabled", outputs === 0)
+      dbugger.print(`#t${trigger.trig_num}`, debug)
+      for (let i = 0; i < 8; i++) {
+        // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
+        let o = $(`#outputs${index} div:nth-of-type(${i + 1})`)
+        dbugger.print(`Output: ${o.html()}`, debug)
+        // dbugger.print(parseInt(outputs,2),debug)
+        if (outputs & (0x01 << i)) {
+          o.addClass("selected")
+        } else {
+          o.removeClass("selected")
+        }
+        // outputs = outputs>>1
+      }
     }
   })
 
@@ -85,14 +112,25 @@ function widget() {
     // meas_div.hide()
   }
 
-  switch (data_handler.data.fxn_num) {
-    case "8":
-      $("#adj_controls, #trigger_controls").hide()
-      break
-    default:
-      meas_div.css({ "text-align": "center" })
-      $("#adj_controls, #trigger_controls").show()
+  if (bonk_obj.in_bounce()) {
+    meas_div.css({ "text-align": "center" })
+    $("#system_message_div").css({ "font-size": "34px" })
+    $(".outputs .output").hide()
+    $("#adj_controls, #trigger_controls, .outputs .bounce").show()
+  } else {
+    $("#system_message_div").css({ "font-size": "14px" })
+    $(".outputs .output").show()
+    $(".outputs .bounce").hide()
+    switch (data_handler.data.fxn_num) {
+      case "8":
+        $("#adj_controls, #trigger_controls").hide()
+        break
+      default:
+        meas_div.css({ "text-align": "center" })
+        $("#adj_controls, #trigger_controls").show()
+    }
   }
+
   if (bonk_obj.in_user_waveforms()) {
     $("#adj_controls, #trigger_controls").hide()
     $("#draw_controls").show()
@@ -241,6 +279,10 @@ function widget() {
   $("div.navigation-top").remove()
   cmd_buttons = $("button[data-ref]")
 
+  $("body").on("keypress", function (e) {
+    console.log("Howdy! " + e.key)
+  })
+
   $("#canvas").on("mousemove", function (e) {
     if (bonk_obj.in_user_waveforms()) {
       const selected_index = parseInt((e.offsetX * 128) / $(this).width())
@@ -321,7 +363,7 @@ function widget() {
   })
 
   $(".outputs div").on("click", function () {
-    const output_num = $(this).html()
+    const output_num = parseInt($(this).html()) + (bonk_obj.in_bounce() ? 8 : 0)
     const trig_num = parseInt($(this).parent().attr("id").replace("outputs", ""))
     dbugger.print(`Trigger: ${trig_num} Output: ${output_num}`, false)
     // set trigger number

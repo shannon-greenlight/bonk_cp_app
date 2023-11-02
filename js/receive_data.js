@@ -32,7 +32,7 @@ receive_data = function (text) {
 
   if (data_handler.status_received) {
     dbugger.print("Receiving Status:")
-    dbugger.print(data_handler.status)
+    dbugger.print(data_handler.status, true)
     device.receive_status()
   } else {
     console.log("Receiving Data:", data_handler.data)

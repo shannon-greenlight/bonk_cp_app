@@ -213,13 +213,17 @@ let data_handler = {
     $("#device_name").html(`"${device_name.trim()}"`)
   },
   get_wave_data: function () {
-    let wave_data
-    try {
-      wave_data = this.data.message.split(", ")
-    } catch (e) {
-      console.log(e)
+    if (this.data.message > "") {
+      let wave_data
+      try {
+        wave_data = this.data.message.split(", ")
+      } catch (e) {
+        console.log(e)
+      }
+      return wave_data
+    } else {
+      return []
     }
-    return wave_data
   },
   param_is_active: function () {
     return this.data.param_active == "1"
