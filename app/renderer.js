@@ -39,6 +39,25 @@ function widget() {
   $("#param_label").html(data_handler.data.fxn)
   $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
 
+  if (bonk_obj.in_bounce()) {
+    meas_div.css({ "text-align": "center" })
+    $("#system_message_div").css({ "font-size": "34px" })
+    $(".outputs .output").hide()
+    $("#adj_controls, #trigger_controls, .outputs .bounce").show()
+  } else {
+    $("#system_message_div").css({ "font-size": "14px" })
+    $(".outputs .output").show()
+    $(".outputs .bounce").hide()
+    switch (data_handler.data.fxn_num) {
+      case "8":
+        $("#adj_controls, #trigger_controls").hide()
+        break
+      default:
+        meas_div.css({ "text-align": "center" })
+        $("#adj_controls, #trigger_controls").show()
+    }
+  }
+
   data_handler.data.triggers.forEach(function (trigger, index, arr) {
     let debug = false
     // disable unselected triggers
@@ -46,27 +65,28 @@ function widget() {
     if (bonk_obj.in_bounce()) {
       let inputs = parseInt(trigger.outputs) >> 8
       let other_input = data_handler.data.fxn === "Bounce 1" ? 1 : 2
-      let selected_input = -1
-      dbugger.print(`Inputs: ${inputs} Other Input: ${other_input}`, false)
       $(`#t${trigger.trig_num}`).prop("disabled", inputs === 0 || inputs === other_input)
+      dbugger.print(`Inputs: ${inputs} Other Input: ${other_input}`, false)
       dbugger.print(`#t${trigger.trig_num}`, debug)
       for (let i = 0; i < 2; i++) {
-        // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
         let o = $(`#outputs${index} div:nth-of-type(${i + 9})`)
         dbugger.print(`Input: ${o.html()}`, debug)
-        // dbugger.print(parseInt(outputs,2),debug)
         if (inputs & (0x01 << i)) {
           o.addClass("selected")
-          selected_input = i
         } else {
           o.removeClass("selected")
         }
-        // outputs = outputs>>1
       }
-      if (selected_input > -1) {
-        let disabled_input = (selected_input = 0 ? 1 : 0)
-        $(`#outputs${index} div:nth-of-type(${disabled_input + 9})`).prop("disabled", true)
-        dbugger.print(`Disabled input: ${disabled_input}`, true)
+      if (inputs > 0) {
+        dbugger.print(`Inputs: ${inputs}`, false)
+        switch (inputs) {
+          case 1:
+            $(`#outputs${index} div:nth-of-type(${2 + 8})`).hide()
+            break
+          case 2:
+            $(`#outputs${index} div:nth-of-type(${1 + 8})`).hide()
+            break
+        }
       }
     } else {
       let outputs = parseInt(trigger.outputs) & 0xff
@@ -112,25 +132,6 @@ function widget() {
     // meas_div.hide()
   }
 
-  if (bonk_obj.in_bounce()) {
-    meas_div.css({ "text-align": "center" })
-    $("#system_message_div").css({ "font-size": "34px" })
-    $(".outputs .output").hide()
-    $("#adj_controls, #trigger_controls, .outputs .bounce").show()
-  } else {
-    $("#system_message_div").css({ "font-size": "14px" })
-    $(".outputs .output").show()
-    $(".outputs .bounce").hide()
-    switch (data_handler.data.fxn_num) {
-      case "8":
-        $("#adj_controls, #trigger_controls").hide()
-        break
-      default:
-        meas_div.css({ "text-align": "center" })
-        $("#adj_controls, #trigger_controls").show()
-    }
-  }
-
   if (bonk_obj.in_user_waveforms()) {
     $("#adj_controls, #trigger_controls").hide()
     $("#draw_controls").show()
@@ -148,10 +149,11 @@ function widget() {
     }
 
     function find_param(param) {
-      dbugger.print(capitalizeFirstLetter(item) + ": ", false)
+      dbugger.print(capitalizeFirstLetter(item) + ": ", true)
       return param.label === capitalizeFirstLetter(item) + ": "
     }
 
+    dbugger.print(`An Item: ${item}`, true)
     if (data_handler.data.params[0]) {
       const res = data_handler.data.params[0].find(find_param)
       if (res) {
@@ -163,8 +165,8 @@ function widget() {
         }
         const item_val = res.value
         const selector = `[id='${item}'],[id='${item}_slider']`
-        dbugger.print(`Item: ${item_val}`, false)
-        dbugger.print(selector, false)
+        dbugger.print(`Item: ${item} ${item_val}`, true)
+        dbugger.print(selector, true)
         const items = $(selector)
         const item_input = $(`[id='${item}']`)
         const item_slider = $(`[id='${item}_slider']`)
@@ -176,6 +178,7 @@ function widget() {
           switch (item) {
             case "scale":
             case "randomness":
+            case "SampleTime":
               // item_input.val(Math.round(100*item_val/item_max))
               item_input.val(item_val)
               break
@@ -199,6 +202,19 @@ function widget() {
     }
   })
 
+  // hide sliders if bounce
+  if (bonk_obj.in_bounce()) {
+    $(
+      "input#randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider']"
+    ).hide()
+    $("#sample_time_slider,#SampleTime_slider").show()
+  } else {
+    $(
+      "input#randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider']"
+    ).show()
+    $("#sample_time_slider,#SampleTime_slider").hide()
+  }
+
   // now disable sliders whose vals are controlled by CV inputs
   function set_adj(search_label, search_id) {
     function find_label(value, index, array) {
@@ -210,7 +226,7 @@ function widget() {
     try {
       param_index = data_handler.data.params[0].find(find_label).param_num
     } catch (e) {
-      dbugger.print(`${search_label} not found!`, true)
+      dbugger.print(`${search_label} not found!`, false)
     }
     if (param_index !== -1) {
       param_val = $(`input[name=p${param_index}]`).val()
@@ -382,6 +398,10 @@ function widget() {
     if (item === "scale" || item === "randomness" || item === "offset") {
       units = "%"
     }
+    if (item === "SampleTime") {
+      units = "ms"
+    }
+
     $(this).html(
       `<label for="${item}">${label}</label><input id="${item}" type="number" step="1" min="0" max="100" cmd="${cmd}" />${units}`
     )
@@ -399,7 +419,7 @@ function widget() {
     $(`[id='${item}']`).on("change", function () {
       let val = parseFloat($(this).val())
       const item_max = $(this).attr("max")
-      dbugger.print(`Item: ${item} val: ${val} item_max: ${item_max}`, false)
+      dbugger.print(`Item: ${item} val: ${val} item_max: ${item_max}`, true)
       switch (item) {
         case "scale":
           val *= 0.01

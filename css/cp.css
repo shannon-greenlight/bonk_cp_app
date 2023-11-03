@@ -614,6 +614,11 @@ label[for="macro"] {
   color: #aaa;
 }
 
+/* #sample_time_slider,
+#SampleTime_slider {
+  display: none;
+} */
+
 #snapshot_button_div {
   text-align: center;
 }
