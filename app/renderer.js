@@ -149,11 +149,11 @@ function widget() {
     }
 
     function find_param(param) {
-      dbugger.print(capitalizeFirstLetter(item) + ": ", true)
+      dbugger.print(capitalizeFirstLetter(item) + ": ", false)
       return param.label === capitalizeFirstLetter(item) + ": "
     }
 
-    dbugger.print(`An Item: ${item}`, true)
+    dbugger.print(`An Item: ${item}`, false)
     if (data_handler.data.params[0]) {
       const res = data_handler.data.params[0].find(find_param)
       if (res) {
@@ -165,8 +165,8 @@ function widget() {
         }
         const item_val = res.value
         const selector = `[id='${item}'],[id='${item}_slider']`
-        dbugger.print(`Item: ${item} ${item_val}`, true)
-        dbugger.print(selector, true)
+        dbugger.print(`Item: ${item} ${item_val}`, false)
+        dbugger.print(selector, false)
         const items = $(selector)
         const item_input = $(`[id='${item}']`)
         const item_slider = $(`[id='${item}_slider']`)
@@ -419,7 +419,7 @@ function widget() {
     $(`[id='${item}']`).on("change", function () {
       let val = parseFloat($(this).val())
       const item_max = $(this).attr("max")
-      dbugger.print(`Item: ${item} val: ${val} item_max: ${item_max}`, true)
+      dbugger.print(`Item: ${item} val: ${val} item_max: ${item_max}`, false)
       switch (item) {
         case "scale":
           val *= 0.01
