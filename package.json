@@ -1,6 +1,6 @@
 {
   "name": "bonk_cp_app",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "Control the Bonkulator from Desktop via USB Serial",
   "main": "main.js",
   "scripts": {
