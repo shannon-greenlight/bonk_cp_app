@@ -1,6 +1,6 @@
 device = {
   type: "Bonkulator",
-  title: "Bonkulator Control Panel v3.2.0",
+  title: "Bonkulator Control Panel v3.2.1",
   port_label: "USB Serial Device",
   init: function () {
     $("#busy_div").fadeOut(1).css("opacity", 1)
