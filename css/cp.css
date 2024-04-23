@@ -610,7 +610,8 @@ label[for="macro"] {
   border: 1px solid #a09e9e;
 }
 
-.slider_input_div input:disabled {
+.slider_input_div input:disabled,
+.item_disabled {
   color: #aaa;
 }
 

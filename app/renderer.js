@@ -61,7 +61,7 @@ function widget() {
   data_handler.data.triggers.forEach(function (trigger, index, arr) {
     let debug = false
     // disable unselected triggers
-    console.log(trigger)
+    // console.log(trigger)
     if (bonk_obj.in_bounce()) {
       let inputs = parseInt(trigger.outputs) >> 8
       let other_input = data_handler.data.fxn === "Bounce 1" ? 1 : 2
@@ -165,12 +165,14 @@ function widget() {
         }
         const item_val = res.value
         const selector = `[id='${item}'],[id='${item}_slider']`
+        dbugger.print(`Res: ${res["label"]} ${res["value"]}`, false)
         dbugger.print(`Item: ${item} ${item_val}`, false)
         dbugger.print(selector, false)
         const items = $(selector)
         const item_input = $(`[id='${item}']`)
         const item_slider = $(`[id='${item}_slider']`)
-        if (data_handler.data[item] === "disabled" || res["value"] === "N/A") {
+        if (res["value"] === "N/A") {
+          dbugger.print("Howdy!", false)
           items.prop("disabled", true)
         } else {
           items.prop("disabled", false).attr("max", item_max).attr("min", item_min)
@@ -191,7 +193,7 @@ function widget() {
               break
             case "offset":
               dbugger.print(`Offset value: ${item_val}`, false)
-              dbugger.print(`out_fs: ${out_fs}`, true)
+              dbugger.print(`out_fs: ${out_fs}`, false)
               dbugger.print(`out_offset: ${out_offset}`, false)
               // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
               item_input.val(item_val)
@@ -215,9 +217,11 @@ function widget() {
     $("#sample_time_slider,#SampleTime_slider").hide()
   }
 
-  // now disable sliders whose vals are controlled by CV inputs
-  function set_adj(search_label, search_id) {
+  // disable sliders whose vals are controlled by CV inputs
+  function set_adj(search_label) {
+    let debug = false
     function find_label(value, index, array) {
+      dbugger.print(`Find: ${value.label} ${search_label}`, debug)
       return value.label === search_label
     }
 
@@ -226,21 +230,25 @@ function widget() {
     try {
       param_index = data_handler.data.params[0].find(find_label).param_num
     } catch (e) {
-      dbugger.print(`${search_label} not found!`, false)
+      dbugger.print(`${search_label} not found!`, true)
     }
     if (param_index !== -1) {
       param_val = $(`input[name=p${param_index}]`).val()
-      $(`#adj_div input[id="${search_id}"], #adj_div input[id="${search_id}_slider"]`).prop(
-        "disabled",
-        param_val.indexOf("CV") === 0
-      )
+      if (param_val != "Off") {
+        dbugger.print(`Set Adjust! ${search_label} ${param_val}`, debug)
+        $(
+          `.slider_input_div[label='${param_val}'] input, .slider_input_div[label='${param_val}'] + input`
+        ).prop("disabled", true)
+        $(
+          `.slider_input_div[label='${param_val}'] label, .slider_input_div[label='${param_val}']`
+        ).addClass("item_disabled")
+      }
     }
   }
 
-  set_adj("Scale: ", "scale")
-  set_adj("Offset: ", "offset")
-  set_adj("Randomness: ", "randomness")
-  set_adj("Idle Value: ", "Idle Value")
+  $(`.slider_input_div, .slider_input_div label`).removeClass("item_disabled")
+  set_adj("CV0: ")
+  set_adj("CV1: ")
 
   //$("#cv_val, #cv_val_slider").prop("disabled", data_handler.data.fxn==="LFO");
 
@@ -379,7 +387,8 @@ function widget() {
   })
 
   $(".outputs div").on("click", function () {
-    const output_num = parseInt($(this).html()) + (bonk_obj.in_bounce() ? 8 : 0)
+    // const output_num = parseInt($(this).html()) + (bonk_obj.in_bounce() ? 8 : 0)
+    const output_num = parseInt($(this).html())
     const trig_num = parseInt($(this).parent().attr("id").replace("outputs", ""))
     dbugger.print(`Trigger: ${trig_num} Output: ${output_num}`, false)
     // set trigger number
