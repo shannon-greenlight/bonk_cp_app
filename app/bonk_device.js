@@ -1,3 +1,6 @@
+// Important!!! For Electron development. Mac and Win must be developed in separate environments.
+// Not doing this will clobber development system. Fixed by deleting @module from node_modules. (@serial_port)
+
 device = {
   type: "Bonkulator",
   title: "Bonkulator Control Panel v3.3.1",
