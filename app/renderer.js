@@ -16,10 +16,76 @@ const zeroPad = (num, places) => String(num).padStart(places, "0")
 //   event.sender.send("counter-value", newValue)
 // })
 
+const OUTPUT_GROUP = 1 // for outputs
+const INPUT_GROUP = 9 // for bounce
+const GROUP_GROUP = 10 // for group
+
+class OutputGroup {
+  constructor(group_type) {
+    this.group_type = group_type
+    this.num_outputs = group_type === INPUT_GROUP ? 2 : 8
+  }
+
+  toggle_output(output_num, trig_num = 0) {
+    this.outputs ^= 1 << output_num
+    if (this.group_type === GROUP_GROUP) {
+      send_cmd(`G${this.outputs}`)
+    } else {
+      // set trigger number
+      send_cmd(`t${trig_num}`)
+      // toggle output
+      send_cmd(`T2${output_num}`)
+    }
+  }
+
+  render() {
+    for (let i = 0; i < this.num_outputs; i++) {
+      let o = this.group.find(`div:nth-of-type(${i + (this.group_type === INPUT_GROUP ? 9 : 1)})`)
+      dbugger.print(`Output: ${o.html()}`, false)
+      dbugger.print(this.outputs, false)
+      o.css("background-color", "")
+      if (this.outputs & (0x01 << i)) {
+        o.addClass("selected")
+      } else {
+        o.removeClass("selected")
+      }
+    }
+    $("#outputs4 div.selected").css(
+      "background-color",
+      group_active ? group_button.active_color : group_button.selected_color
+    )
+    // allow only one active at any time when in bounce
+    if (this.group_type === INPUT_GROUP && this.outputs > 0) {
+      dbugger.print(`Inputs: ${this.outputs}`, false)
+      switch (this.outputs) {
+        case 1:
+          this.group.find(`div:nth-of-type(${2 + 8})`).hide()
+          break
+        case 2:
+          this.group.find(`div:nth-of-type(${1 + 8})`).hide()
+          break
+      }
+    }
+  }
+}
+
+const ig = new OutputGroup(INPUT_GROUP)
+const og = new OutputGroup(OUTPUT_GROUP)
+const gg = new OutputGroup(GROUP_GROUP)
+
+let group = { outputs: 0 } // for Group Button
+//const group_button = new Button("group", rgb(80, 11, 85), rgb(180, 111, 185))
+const group_button = new Button("group", "#602b65", "#a06ba5")
+let group_active = false
+
 let selected_data, selected_param
 function widget() {
   $ = jQuery
   data_handler.render_device_name()
+  group.outputs = data_handler.data.group
+  group_button.trigger = group
+  group_active = data_handler.data.group_active == "1"
+  group_button.set(group_active ? "ON" : "OFF")
 
   const activate_button = $("#activate_button")
   if (data_handler.param_is_active()) {
@@ -60,52 +126,53 @@ function widget() {
 
   data_handler.data.triggers.forEach(function (trigger, index, arr) {
     let debug = false
-    // disable unselected triggers
     // console.log(trigger)
+    // disable unselected triggers
+    // remove group outputs if in bounce
+    $(`#outputs4, #group, #group_label`).toggle(!bonk_obj.in_bounce())
     if (bonk_obj.in_bounce()) {
       let inputs = parseInt(trigger.outputs) >> 8
+      let obj = $(`#outputs${index}`)
       let other_input = data_handler.data.fxn === "Bounce 1" ? 1 : 2
       $(`#t${trigger.trig_num}`).prop("disabled", inputs === 0 || inputs === other_input)
       dbugger.print(`Inputs: ${inputs} Other Input: ${other_input}`, false)
-      dbugger.print(`#t${trigger.trig_num}`, debug)
-      for (let i = 0; i < 2; i++) {
-        let o = $(`#outputs${index} div:nth-of-type(${i + 9})`)
-        dbugger.print(`Input: ${o.html()}`, debug)
-        if (inputs & (0x01 << i)) {
-          o.addClass("selected")
-        } else {
-          o.removeClass("selected")
-        }
-      }
-      if (inputs > 0) {
-        dbugger.print(`Inputs: ${inputs}`, false)
-        switch (inputs) {
-          case 1:
-            $(`#outputs${index} div:nth-of-type(${2 + 8})`).hide()
-            break
-          case 2:
-            $(`#outputs${index} div:nth-of-type(${1 + 8})`).hide()
-            break
-        }
-      }
+      dbugger.print(`#t${trigger.trig_num}`, false)
+      dbugger.print(`Index: ${index}`, false)
+      ig.group = obj
+      ig.outputs = inputs
+      ig.render()
     } else {
       let outputs = parseInt(trigger.outputs) & 0xff
+      let obj = $(`#outputs${index}`)
       $(`#t${trigger.trig_num}`).prop("disabled", outputs === 0)
       dbugger.print(`#t${trigger.trig_num}`, debug)
-      for (let i = 0; i < 8; i++) {
-        // let o = $(`.outputs:nth-of-type(${index}) div:nth-of-type(${i})`)
-        let o = $(`#outputs${index} div:nth-of-type(${i + 1})`)
-        dbugger.print(`Output: ${o.html()}`, debug)
-        // dbugger.print(parseInt(outputs,2),debug)
-        if (outputs & (0x01 << i)) {
-          o.addClass("selected")
-        } else {
-          o.removeClass("selected")
-        }
-        // outputs = outputs>>1
+      og.group = obj
+      og.outputs = outputs
+      og.render()
+      switch (index) {
+        case 0:
+          t0_button.state = data_handler.data.triggers[0].state === "1"
+          t0_button.set(t0_button.state ? "ON" : "OFF")
+          break
+        case 1:
+          t1_button.state = data_handler.data.triggers[1].state === "1"
+          t1_button.set(t1_button.state ? "ON" : "OFF")
+          break
+        case 2:
+          t2_button.state = data_handler.data.triggers[2].state === "1"
+          t2_button.set(t2_button.state ? "ON" : "OFF")
+          break
+        case 3:
+          t3_button.state = data_handler.data.triggers[3].state === "1"
+          t3_button.set(t3_button.state ? "ON" : "OFF")
+          break
       }
     }
   })
+
+  gg.group = $(`#outputs4`)
+  gg.outputs = data_handler.data.group
+  gg.render()
 
   the_canvas.hide()
   meas_div.hide()
@@ -157,11 +224,23 @@ function widget() {
     if (data_handler.data.params[0]) {
       const res = data_handler.data.params[0].find(find_param)
       if (res) {
-        let item_max = data_handler.data[$(this).attr("max")]
-        let item_min = data_handler.data[$(this).attr("min")]
-        if (item === "Idle Value") {
-          item_max = res.max
-          item_min = res.min
+        // let item_max = data_handler.data[$(this).attr("max")]
+        // let item_min = data_handler.data[$(this).attr("min")]
+        // if (item === "Idle Value") {
+        //   item_max = res.max
+        //   item_min = res.min
+        // }
+        let item_max
+        let item_min
+        switch (item) {
+          case "Idle Value":
+          case "Active Time":
+            item_max = res.max
+            item_min = res.min
+            break
+          default:
+            item_max = data_handler.data[$(this).attr("max")]
+            item_min = data_handler.data[$(this).attr("min")]
         }
         const item_val = res.value
         const selector = `[id='${item}'],[id='${item}_slider']`
@@ -178,12 +257,6 @@ function widget() {
           items.prop("disabled", false).attr("max", item_max).attr("min", item_min)
           item_slider.val(item_val)
           switch (item) {
-            case "scale":
-            case "randomness":
-            case "SampleTime":
-              // item_input.val(Math.round(100*item_val/item_max))
-              item_input.val(item_val)
-              break
             case "Idle Value":
               let ival = parseFloat(item_val) / Math.pow(10, res.dp)
               dbugger.print(`dp: ${res.dp}`, false)
@@ -198,6 +271,8 @@ function widget() {
               // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
               item_input.val(item_val)
               break
+            default:
+              item_input.val(item_val)
           }
         }
       }
@@ -222,7 +297,7 @@ function widget() {
     let debug = false
     function find_label(value, index, array) {
       dbugger.print(`Find: ${value.label} ${search_label}`, debug)
-      return value.label === search_label
+      return value.label.substring(0, 3) === search_label
     }
 
     let param_index = -1
@@ -247,8 +322,8 @@ function widget() {
   }
 
   $(`.slider_input_div, .slider_input_div label`).removeClass("item_disabled")
-  set_adj("CV0: ")
-  set_adj("CV1: ")
+  set_adj("CV0")
+  set_adj("CV1")
 
   //$("#cv_val, #cv_val_slider").prop("disabled", data_handler.data.fxn==="LFO");
 
@@ -387,14 +462,37 @@ function widget() {
   })
 
   $(".outputs div").on("click", function () {
-    // const output_num = parseInt($(this).html()) + (bonk_obj.in_bounce() ? 8 : 0)
     const output_num = parseInt($(this).html())
     const trig_num = parseInt($(this).parent().attr("id").replace("outputs", ""))
     dbugger.print(`Trigger: ${trig_num} Output: ${output_num}`, false)
-    // set trigger number
-    send_cmd(`t${trig_num}`)
-    // toggle output
-    send_cmd(`T2${output_num}`)
+    if (trig_num < 4) {
+      og.toggle_output(output_num, trig_num)
+    } else {
+      gg.toggle_output(output_num, 4)
+    }
+  })
+
+  $("#group").on("click", function () {
+    const send_param = group_active ? 0 : 1
+    dbugger.print(`Send Param: ${send_param}`, false)
+    send_cmd(`g${send_param}`)
+  })
+
+  $("#t0, #t2, #t2, #t3").on("click", function () {
+    switch ($(this).attr("id")) {
+      case "t0":
+        t0_button.set("ON")
+        break
+      case "t1":
+        t1_button.set("ON")
+        break
+      case "t2":
+        t2_button.set("ON")
+        break
+      case "t3":
+        t3_button.set("ON")
+        break
+    }
   })
 
   $(".slider_input_div").each(function (indx) {
@@ -407,7 +505,7 @@ function widget() {
     if (item === "scale" || item === "randomness" || item === "offset") {
       units = "%"
     }
-    if (item === "SampleTime") {
+    if (item === "SampleTime" || item === "Active Time") {
       units = "ms"
     }
 
