@@ -13,7 +13,7 @@ async function listSerialPorts() {
     } else {
       // do nothing, leave the error for clearing manually
     }
-    console.log("ports", ports)
+    // console.log("ports", ports)
 
     if (ports.length === 0) {
       document.getElementById("error").textContent = "No ports discovered"
@@ -26,17 +26,20 @@ async function listSerialPorts() {
     tableHTML = tableHTML.replace("vendorId", "Vendor ID")
     // console.log(tableHTML)
     document.getElementById("ports_table").innerHTML = tableHTML
+    const is_win = process.platform === "win32"
+    // const is_win = $("#ports_table th:nth-of-type(8)").html() === "productId"
+    const label_index = is_win ? 6 : 2
+    const vendorId_index = is_win ? 7 : 6
+    const device_index = is_win ? 6 : 7
+    const label_val = is_win ? device.port_label : "Arduino"
     $("#ports_table tr").each(function (indx) {
       if (indx === 0) return
-      const label = $(this).find("td:nth-child(6)").html()
-      const vendorID = $(this).find("td:nth-child(7)").html()
-      // console.log(`Label: ${label} vendorID: ${vendorID}`)
+      const label = $(this).find(`td:nth-child(${label_index})`).html()
+      const vendorID = $(this).find(`td:nth-child(${vendorId_index})`).html()
+      // console.log(`Label: ${label} vendorID: ${vendorID} is_win: ${is_win}`)
       if (label) {
-        if (label.indexOf(device.port_label) === 0 && vendorID === "2341") {
-          $(this)
-            .addClass("enable_port")
-            .find("td:nth-child(6)")
-            .html(label.replace(device.port_label, device.type))
+        if (label.indexOf(label_val) === 0 && vendorID === "2341") {
+          $(this).addClass("enable_port").find(`td:nth-child(${device_index})`).html("Bonkulator")
         } else {
           $(this).removeClass("enable_port")
         }
