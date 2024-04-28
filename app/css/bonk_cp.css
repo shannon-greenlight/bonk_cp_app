@@ -61,6 +61,11 @@
   background-color: #d66;
 }
 
+#group,
+#outputs4 div.selected {
+  background-color: #904b95;
+}
+
 /* #t0 {
   background-color: #6d6;
 }
