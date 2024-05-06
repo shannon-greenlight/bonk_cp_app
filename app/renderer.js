@@ -2,14 +2,14 @@ $ = jQuery
 
 waveform_obj.init()
 
-let snapshot = ""
-let out_fs = 0
-let out_offset = 0
-let cmd_buttons
-let legal_values
-const cv_offset = 5.4
+// let snapshot = ""
+// let out_fs = 0
+// let out_offset = 0
+// let cmd_buttons
+// let legal_values
+// const cv_offset = 5.4
 
-const zeroPad = (num, places) => String(num).padStart(places, "0")
+// const zeroPad = (num, places) => String(num).padStart(places, "0")
 
 // window.electronAPI.handleTitle((event, value) => {
 //   document.title = value
@@ -79,8 +79,14 @@ const group_button = new Button("group", "#602b65", "#a06ba5")
 let group_active = false
 
 let selected_data, selected_param
+
 function widget() {
   $ = jQuery
+  if (data_handler.data.software_version < "v3.5.0") {
+    alert("Software version is too old. Please update to v3.5.0 or later.")
+    return
+  }
+
   data_handler.render_device_name()
   group.outputs = data_handler.data.group
   group_button.trigger = group
@@ -209,123 +215,9 @@ function widget() {
   let controls = ""
   $("#params").html(data_handler.display_params(controls))
 
-  $(".slider_input_div").each(function (indx) {
-    let item = $(this).attr("item") // ie. 'scale';
-    function capitalizeFirstLetter(string) {
-      return string[0].toUpperCase() + string.slice(1)
-    }
-
-    function find_param(param) {
-      dbugger.print(capitalizeFirstLetter(item) + ": ", false)
-      return param.label === capitalizeFirstLetter(item) + ": "
-    }
-
-    dbugger.print(`An Item: ${item}`, false)
-    if (data_handler.data.params[0]) {
-      const res = data_handler.data.params[0].find(find_param)
-      if (res) {
-        // let item_max = data_handler.data[$(this).attr("max")]
-        // let item_min = data_handler.data[$(this).attr("min")]
-        // if (item === "Idle Value") {
-        //   item_max = res.max
-        //   item_min = res.min
-        // }
-        let item_max
-        let item_min
-        switch (item) {
-          case "Idle Value":
-          case "Active Time":
-            item_max = res.max
-            item_min = res.min
-            break
-          default:
-            item_max = data_handler.data[$(this).attr("max")]
-            item_min = data_handler.data[$(this).attr("min")]
-        }
-        const item_val = res.value
-        const selector = `[id='${item}'],[id='${item}_slider']`
-        dbugger.print(`Res: ${res["label"]} ${res["value"]}`, false)
-        dbugger.print(`Item: ${item} ${item_val}`, false)
-        dbugger.print(selector, false)
-        const items = $(selector)
-        const item_input = $(`[id='${item}']`)
-        const item_slider = $(`[id='${item}_slider']`)
-        if (res["value"] === "N/A") {
-          dbugger.print("Howdy!", false)
-          items.prop("disabled", true)
-        } else {
-          items.prop("disabled", false).attr("max", item_max).attr("min", item_min)
-          item_slider.val(item_val)
-          switch (item) {
-            case "Idle Value":
-              let ival = parseFloat(item_val) / Math.pow(10, res.dp)
-              dbugger.print(`dp: ${res.dp}`, false)
-              dbugger.print(`Idle value: ${ival}`, false)
-              item_input.val(ival)
-              // item_input.val((out_fs*item_val/item_max - out_offset).toFixed(2))
-              break
-            case "offset":
-              dbugger.print(`Offset value: ${item_val}`, false)
-              dbugger.print(`out_fs: ${out_fs}`, false)
-              dbugger.print(`out_offset: ${out_offset}`, false)
-              // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
-              item_input.val(item_val)
-              break
-            default:
-              item_input.val(item_val)
-          }
-        }
-      }
-    }
-  })
-
-  // hide sliders if bounce
-  if (bonk_obj.in_bounce()) {
-    $(
-      "input#randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider']"
-    ).hide()
-    $("#sample_time_slider,#SampleTime_slider").show()
-  } else {
-    $(
-      "input#randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider']"
-    ).show()
-    $("#sample_time_slider,#SampleTime_slider").hide()
-  }
-
-  // disable sliders whose vals are controlled by CV inputs
-  function set_adj(search_label) {
-    let debug = false
-    function find_label(value, index, array) {
-      dbugger.print(`Find: ${value.label} ${search_label}`, debug)
-      return value.label.substring(0, 3) === search_label
-    }
-
-    let param_index = -1
-    let param_val
-    try {
-      param_index = data_handler.data.params[0].find(find_label).param_num
-    } catch (e) {
-      dbugger.print(`${search_label} not found!`, true)
-    }
-    if (param_index !== -1) {
-      param_val = $(`input[name=p${param_index}]`).val()
-      if (param_val != "Off") {
-        dbugger.print(`Set Adjust! ${search_label} ${param_val}`, debug)
-        $(
-          `.slider_input_div[label='${param_val}'] input, .slider_input_div[label='${param_val}'] + input`
-        ).prop("disabled", true)
-        $(
-          `.slider_input_div[label='${param_val}'] label, .slider_input_div[label='${param_val}']`
-        ).addClass("item_disabled")
-      }
-    }
-  }
-
-  $(`.slider_input_div, .slider_input_div label`).removeClass("item_disabled")
-  set_adj("CV0")
-  set_adj("CV1")
-
-  //$("#cv_val, #cv_val_slider").prop("disabled", data_handler.data.fxn==="LFO");
+  // build sliders
+  sliders_obj.build_sliders()
+  sliders_obj.set_display()
 
   // now set selected components input control
   selected_data = data_handler.find_selected_data()
@@ -495,59 +387,7 @@ function widget() {
     }
   })
 
-  $(".slider_input_div").each(function (indx) {
-    const item = $(this).attr("item")
-    let cmd = $(this).attr("cmd")
-    let label = $(this).attr("label")
-    let units = "V"
-    let item_min = 0
-    let item_max = 1023
-    if (item === "scale" || item === "randomness" || item === "offset") {
-      units = "%"
-    }
-    if (item === "SampleTime" || item === "Active Time") {
-      units = "ms"
-    }
-
-    $(this).html(
-      `<label for="${item}">${label}</label><input id="${item}" type="number" step="1" min="0" max="100" cmd="${cmd}" />${units}`
-    )
-    $(this).after(
-      `<input id="${item}_slider" class="item_slider" cmd="${cmd}" type="range" min="${item_min}" max="${item_max}" value="512">`
-    )
-
-    $(`[id='${item}_slider']`).on("change", function () {
-      // $(`.item_slider`).on("change", function () {
-      const val = $(this).val()
-      send_cmd(cmd + val)
-    })
-
-    // direct numeric input
-    $(`[id='${item}']`).on("change", function () {
-      let val = parseFloat($(this).val())
-      const item_max = $(this).attr("max")
-      dbugger.print(`Item: ${item} val: ${val} item_max: ${item_max}`, false)
-      switch (item) {
-        case "scale":
-          val *= 0.01
-          val = val * item_max
-          break
-        case "offset":
-          // val = val / (out_fs / 100)
-          break
-        case "Idle Value":
-          // val += out_offset
-          // val = val / out_fs
-          // val = val * item_max
-          val = val * 1000
-          dbugger.print(
-            `Idle Value: ${val}, FS: ${out_fs}, offset: ${out_offset}, max: ${item_max}`,
-            false
-          )
-      }
-      send_cmd(cmd + Math.round(val))
-    })
-  })
+  sliders_obj.on_load()
 
   if (typeof url !== "undefined") refresh_screen()
 })(jQuery)

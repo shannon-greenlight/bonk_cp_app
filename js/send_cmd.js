@@ -155,7 +155,7 @@ function set_selected_param(selected_data) {
     $("#param_head").html(`<strong>Enter ${selected_data.label}</strong>`)
     $("#param_value").html(data_handler.display_input(selected_data))
     let a = $("#param_value").detach()
-    console.log(a)
+    //console.log(a)
     $("div.selected.param").append(a)
     switch (selected_param.attr("component")) {
       case "select":

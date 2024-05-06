@@ -4,7 +4,8 @@ let data_handler = {
   status_received: false,
   receive_data: function (text) {
     const incoming_data = JSON.parse(text)
-    this.status_received = incoming_data.status
+    // console.log("Incoming data:", incoming_data)
+    this.status_received = incoming_data.event
     if (this.status_received) {
       this.status = incoming_data
     } else {
@@ -191,6 +192,18 @@ let data_handler = {
       //console.log(fxns);
       //   cmd_buttons = $("button[data-ref]")
     }
+  },
+  find_param: function (item) {
+    function capitalizeFirstLetter(string) {
+      return string[0].toUpperCase() + string.slice(1)
+    }
+
+    function find_param(param) {
+      dbugger.print(capitalizeFirstLetter(item) + ": " + param.label, false)
+      return param.label === capitalizeFirstLetter(item) + ": "
+    }
+    // find item in params
+    return this.data.params[0].find(find_param)
   },
   find_selected_param: function () {
     if (this.data.params[0]) {

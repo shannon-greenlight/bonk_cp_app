@@ -78,7 +78,7 @@ function prep_request(cmd) {
   //   if (cmd === "") res.fail = true
   res.cmd = cmd + "\r"
   if (!res.fail) {
-    console.log("Sending: " + cmd)
+    // console.log("Sending: " + cmd)
     if (use_busy()) {
       $("#busy_div").fadeIn(10)
       force_use_busy = false

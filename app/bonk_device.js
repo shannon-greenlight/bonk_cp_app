@@ -3,7 +3,7 @@
 
 device = {
   type: "Bonkulator",
-  title: "Bonkulator Control Panel v3.3.1",
+  title: "Bonkulator Control Panel v3.4.0",
   port_label: "USB Serial Device",
   init: function () {
     $("#busy_div").fadeOut(1).css("opacity", 1)
@@ -40,9 +40,33 @@ device = {
     t3_button.trigger = data_handler.data.triggers[3]
   },
   receive_status: function () {
-    t0_button.set(data_handler.status.t0)
-    t1_button.set(data_handler.status.t1)
-    t2_button.set(data_handler.status.t2)
-    t3_button.set(data_handler.status.t3)
+    switch (data_handler.status.event) {
+      case "trigger":
+        t0_button.set(data_handler.status.t0)
+        t1_button.set(data_handler.status.t1)
+        t2_button.set(data_handler.status.t2)
+        t3_button.set(data_handler.status.t3)
+        break
+      case "scale":
+      case "offset":
+      case "Active Time":
+      case "SampleTime":
+      case "randomness":
+      case "Idle Value":
+        dbugger.print("Status: " + data_handler.status.event, false)
+        const param = data_handler.find_param(data_handler.status.event)
+        if (param) {
+          data_handler.data.params[0][param.param_num].value = data_handler.data.params[0][
+            param.param_num
+          ].numeric_value = data_handler.status.value
+          // sliders_obj.build_slider($(`input[id='${data_handler.status.event}']`).parent())
+        } else {
+          console.log("Recv Status - Param not found: " + data_handler.status.event)
+        }
+        the_queue.busy = false // this data was recvd as result of a request from queue
+        break
+      default:
+        console.log("Unknown event: " + data_handler.status.event)
+    }
   },
 }
