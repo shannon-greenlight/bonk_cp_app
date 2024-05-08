@@ -199,16 +199,16 @@
                     </div>
                 </div>
                 <div id="adj_controls">
-                    <label for="adj_div">Waveform <span id="analog_label"></span></label>
+                    <label for="adj_div" id="sliders_label">Waveform</label>
                     <div id="adj_div" class="display_box">
-                        <div class="slider_input_div" label="Scale" max="scale_max" min="scale_min" item="scale"
+                        <div class="slider_input_div" label="Scale" max="scale_max" min="scale_min" item="Scale"
                             cmd="S"></div>
-                        <div class="slider_input_div" label="Offset" max="offset_max" min="offset_min" item="offset"
+                        <div class="slider_input_div" label="Offset" max="offset_max" min="offset_min" item="Offset"
                             cmd="O"></div>
                         <div id="active_time_slider_div" class="slider_input_div" label="Active Time" max="offset_max"
                             min="offset_min" item="Active Time" cmd="A"></div>
                         <div id="randomness_slider_div" class="slider_input_div" label="Randomness" max="scale_max"
-                            item="randomness" cmd="R">
+                            item="Randomness" cmd="R">
                         </div>
                         <div id="idle_value_slider" class="slider_input_div" label="Idle Value" max="dac_fs"
                             item="Idle Value" cmd="V"></div>
@@ -267,17 +267,22 @@
 renderer.js will be executed in the renderer process for index.html.
 All of the Node.js APIs are available in this process.
  -->
-<script src="../js/renderer_vars.js"></script>
-<script src="../js/sliders_obj.js"></script>
 <script src="../app/bonk_device.js"></script>
 <script src="../js/dbugger.js"></script>
+<script src="../app/button.js"></script>
 <script src="../serial_port/serial_port.js"></script>
 <script src="../js/waveform_obj.js"></script>
 <script src="../js/send_cmd.js"></script>
+<script src="../app/params_obj.js"></script>
+<script src="../app/sliders_obj.js"></script>
+<script src="../app/groups.js"></script>
+<script src="../app/controls_obj.js"></script>
+<script src="../app/outputs_obj.js"></script>
+<script src="../app/triggers_obj.js"></script>
+<script src="../app/canvas_obj.js"></script>
 <script src="../js/data_handler.js"></script>
 <script src="../app/bonk_obj.js"></script>
 <script src="../js/the_macro.js"></script>
-<script src="../app/button.js"></script>
 <script src="../app/renderer.js"></script>
 <script src="../js/receive_data.js"></script>
 

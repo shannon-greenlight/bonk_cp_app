@@ -8,7 +8,7 @@ const sliders_obj = {
       let units = "V"
       let item_min = 0
       let item_max = 1023
-      if (item === "scale" || item === "randomness" || item === "offset") {
+      if (item === "Scale" || item === "Randomness" || item === "Offset") {
         units = "%"
       }
       if (item === "SampleTime" || item === "Active Time") {
@@ -38,18 +38,9 @@ const sliders_obj = {
             val *= 0.01
             val = val * item_max
             break
-          case "offset":
-            // val = val / (out_fs / 100)
-            break
           case "Idle Value":
-            // val += out_offset
-            // val = val / out_fs
-            // val = val * item_max
             val = val * 1000
-            dbugger.print(
-              `Idle Value: ${val}, FS: ${out_fs}, offset: ${out_offset}, max: ${item_max}`,
-              false
-            )
+            dbugger.print(`Idle Value: ${val}, max: ${item_max}`, false)
         }
         send_cmd(cmd + Math.round(val))
         send_cmd(" ")
@@ -59,21 +50,28 @@ const sliders_obj = {
   build_slider: function (o) {
     let item = o.attr("item") // ie. 'scale';
     // console.log(o)
-    // dbugger.print(`An Item: ${item}`, true)
+    dbugger.print(`build_slider Item: ${item}`, false)
     if (data_handler.data.params[0]) {
       const res = data_handler.find_param(item)
       if (res) {
         let item_max
         let item_min
         switch (item) {
-          case "Idle Value":
-          case "Active Time":
+          case "SampleTime":
+            item_max = 32767
+            item_min = 100
+            break
+          //   case "Scale":
+          //   case "Idle Value":
+          //   case "Active Time":
+          //     item_max = res.max
+          //     item_min = res.min
+          //     break
+          default:
+            // item_max = data_handler.data[o.attr("max")]
+            // item_min = data_handler.data[o.attr("min")]
             item_max = res.max
             item_min = res.min
-            break
-          default:
-            item_max = data_handler.data[o.attr("max")]
-            item_min = data_handler.data[o.attr("min")]
         }
         const item_val = res.value
         const selector = `[id='${item}'],[id='${item}_slider']`
@@ -95,13 +93,9 @@ const sliders_obj = {
               dbugger.print(`dp: ${res.dp}`, false)
               dbugger.print(`Idle value: ${ival}`, false)
               item_input.val(ival)
-              // item_input.val((out_fs*item_val/item_max - out_offset).toFixed(2))
               break
-            case "offset":
+            case "Offset":
               dbugger.print(`Offset value: ${item_val}`, false)
-              dbugger.print(`out_fs: ${out_fs}`, false)
-              dbugger.print(`out_offset: ${out_offset}`, false)
-              // item_input.val(((out_fs-out_offset) * item_val / item_max).toFixed(2))
               item_input.val(item_val)
               break
             default:
@@ -116,6 +110,8 @@ const sliders_obj = {
     $(".slider_input_div").each(function (indx) {
       self.build_slider($(this))
     })
+    $("#sliders_label").html(bonk_obj.in_bounce() ? "Output" : "Waveform")
+    this.set_display()
   },
   set_adj: function (search_label) {
     let debug = false
@@ -147,7 +143,7 @@ const sliders_obj = {
   set_display: function () {
     // hide sliders if bounce
     const sliders = $(
-      "input#randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider'],#active_time_slider_div, input[id='Active Time_slider']"
+      "input#Randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider'],#active_time_slider_div, input[id='Active Time_slider']"
     )
     if (bonk_obj.in_bounce()) {
       sliders.hide()

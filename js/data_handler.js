@@ -1,3 +1,5 @@
+const zeroPad = (num, places) => String(num).padStart(places, "0")
+
 let data_handler = {
   data: null,
   status: null,
@@ -190,7 +192,6 @@ let data_handler = {
       }
       $("#fxn_buttons").html(fxns)
       //console.log(fxns);
-      //   cmd_buttons = $("button[data-ref]")
     }
   },
   find_param: function (item) {

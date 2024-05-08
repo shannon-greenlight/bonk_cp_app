@@ -108,7 +108,7 @@ let waveform_obj = {
       $("#canvas").css("cursor", "pointer")
     }
   },
-  init: function () {
+  on_load: function () {
     let self = this
     document.body.onmouseup = function () {
       self.draw_mode_off()

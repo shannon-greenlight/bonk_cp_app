@@ -3,7 +3,7 @@
 
 device = {
   type: "Bonkulator",
-  title: "Bonkulator Control Panel v3.4.0",
+  title: "Bonkulator Control Panel v3.4.1",
   port_label: "USB Serial Device",
   init: function () {
     $("#busy_div").fadeOut(1).css("opacity", 1)
@@ -55,11 +55,9 @@ device = {
       case "Idle Value":
         dbugger.print("Status: " + data_handler.status.event, false)
         const param = data_handler.find_param(data_handler.status.event)
+        const data_item = data_handler.data.params[0][param.param_num]
         if (param) {
-          data_handler.data.params[0][param.param_num].value = data_handler.data.params[0][
-            param.param_num
-          ].numeric_value = data_handler.status.value
-          // sliders_obj.build_slider($(`input[id='${data_handler.status.event}']`).parent())
+          data_item.value = data_item.numeric_value = data_handler.status.value
         } else {
           console.log("Recv Status - Param not found: " + data_handler.status.event)
         }

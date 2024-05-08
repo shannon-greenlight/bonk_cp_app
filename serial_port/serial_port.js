@@ -36,7 +36,7 @@ async function listSerialPorts() {
       if (indx === 0) return
       const label = $(this).find(`td:nth-child(${label_index})`).html()
       const vendorID = $(this).find(`td:nth-child(${vendorId_index})`).html()
-      // console.log(`Label: ${label} vendorID: ${vendorID} is_win: ${is_win}`)
+      // console.log(`Label: ${label_val} vendorID: ${vendorID} is_win: ${is_win}`)
       if (label) {
         if (label.indexOf(label_val) === 0 && vendorID === "2341") {
           $(this).addClass("enable_port").find(`td:nth-child(${device_index})`).html("Bonkulator")
