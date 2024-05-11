@@ -25,7 +25,7 @@ async function createWindow() {
   })
 
   // Load app
-  win.loadFile(path.join(__dirname, "serial_port/index.html"))
+  win.loadFile(path.join(__dirname, "app/index.html"))
 
   // rest of code..
   // Open the DevTools.
