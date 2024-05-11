@@ -44,7 +44,7 @@ const params_obj = {
     param_value
       .on("change", "#param_input", function () {
         dbugger.print("param_value Changin!", false)
-        if ($(this).attr("type") === "text" && !$(this).hasClass("sequence")) {
+        if ($(this).attr("type") === "text" || $(this).hasClass("sequence")) {
           send_cmd("$" + $(this).val())
         } else {
           send_cmd($(this).val())
@@ -96,7 +96,7 @@ const params_obj = {
   build_params: function (data) {
     let controls = ""
     $("#params").html(data_handler.display_params(controls))
-    $("#param_label").html(data_handler.data.fxn)
+    $("#param_label").html(data_handler.data.fxn + " Parameters")
     $("#input_div .param_div").append('<div id="param_value" class="param"></div>')
     // set selected components input control
     if (selected_data) {
@@ -138,15 +138,19 @@ const params_obj = {
   },
 
   set_param_nav_buttons: function () {
-    $("#control_div #param_box button[data-ref]").prop("disabled", false)
-    const num_params = $("#params .param_div").length
-    dbugger.print(`Num params: ${num_params}`, false)
-    $("#param_buttons button").prop("disabled", num_params < 2)
-    const selected_type = $("#param_input").attr("type")
-    $("#lr_buttons button, #inc_controls button").prop(
-      "disabled",
-      selected_type !== "number" && selected_type !== "text"
-    )
-    dbugger.print(`Selected type: ${selected_type}`, false)
+    if (!common_obj.in_user_fxn()) {
+      $("#control_div #param_box button[data-ref]").prop("disabled", false)
+      const num_params = $("#params .param_div").length
+      dbugger.print(`Num params: ${num_params}`, false)
+      $("#param_buttons button").prop("disabled", num_params < 2)
+      const selected_type = $("#param_input").attr("type")
+      $("#lr_buttons button, #inc_controls button").prop(
+        "disabled",
+        selected_type !== "number" && selected_type !== "text"
+      )
+      dbugger.print(`Selected type: ${selected_type}`, false)
+    } else {
+      $("#param_buttons button").prop("disabled", false)
+    }
   },
 }

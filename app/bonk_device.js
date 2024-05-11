@@ -9,7 +9,7 @@ device = {
     $("#busy_div").fadeOut(1).css("opacity", 1)
   },
   take_snapshot: function (data, out) {
-    if (bonk_obj.in_user_waveforms()) {
+    if (common_obj.in_user_waveforms()) {
       // console.log("Taking snapshot of " + data.fxn)
 
       out.shift() // amend start of macro

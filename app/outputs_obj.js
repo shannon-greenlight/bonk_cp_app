@@ -1,6 +1,6 @@
 const outputs_obj = {
   build_outputs: function () {
-    if (bonk_obj.in_bounce()) {
+    if (common_obj.in_bounce()) {
       $(".outputs .output").hide()
       $(".outputs .bounce").show()
     } else {

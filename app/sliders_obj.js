@@ -110,7 +110,7 @@ const sliders_obj = {
     $(".slider_input_div").each(function (indx) {
       self.build_slider($(this))
     })
-    $("#sliders_label").html(bonk_obj.in_bounce() ? "Output" : "Waveform")
+    $("#sliders_label").html(common_obj.in_bounce() ? "Output" : "Waveform")
     this.set_display()
   },
   set_adj: function (search_label) {
@@ -145,7 +145,7 @@ const sliders_obj = {
     const sliders = $(
       "input#Randomness_slider, div#randomness_slider_div,#idle_value_slider, input[id='Idle Value_slider'],#active_time_slider_div, input[id='Active Time_slider']"
     )
-    if (bonk_obj.in_bounce()) {
+    if (common_obj.in_bounce()) {
       sliders.hide()
       $("#sample_time_slider,#SampleTime_slider").show()
     } else {

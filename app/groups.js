@@ -73,7 +73,7 @@ const groups_obj = {
     group_active = data_handler.data.group_active == "1"
     group_button.set(group_active ? "ON" : "OFF")
     data_handler.data.triggers.forEach(function (trigger, index, arr) {
-      if (bonk_obj.in_bounce()) {
+      if (common_obj.in_bounce()) {
         let inputs = parseInt(trigger.outputs) >> 8
         let obj = $(`#outputs${index}`)
         inputs_group.render(obj, inputs)

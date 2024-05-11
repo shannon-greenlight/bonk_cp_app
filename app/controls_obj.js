@@ -7,14 +7,14 @@ const controls_obj = {
       activate_button.fadeOut()
     }
 
-    if (bonk_obj.in_user_waveforms()) {
+    if (common_obj.in_user_waveforms()) {
       $("#adj_controls, #trigger_controls").hide()
       $("#user_waveform_controls, #draw_controls").show()
     } else {
       $("#user_waveform_controls, #draw_controls").hide()
     }
 
-    if (bonk_obj.in_bounce()) {
+    if (common_obj.in_bounce()) {
       $("#adj_controls, #trigger_controls").show()
     } else {
       switch (data_handler.data.fxn_num) {

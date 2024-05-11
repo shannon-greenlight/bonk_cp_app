@@ -5,8 +5,8 @@ const triggers_obj = {
       // console.log(trigger)
       // disable unselected triggers
       // remove group outputs if in bounce
-      $(`#outputs4, #group, #group_label`).toggle(!bonk_obj.in_bounce())
-      if (bonk_obj.in_bounce()) {
+      $(`#outputs4, #group, #group_label`).toggle(!common_obj.in_bounce())
+      if (common_obj.in_bounce()) {
         let inputs = parseInt(trigger.outputs) >> 8
         let other_input = data_handler.data.fxn === "Bounce 1" ? 1 : 2
         $(`#t${trigger.trig_num}`).prop("disabled", inputs === 0 || inputs === other_input)

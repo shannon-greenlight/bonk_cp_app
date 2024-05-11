@@ -4,7 +4,7 @@ const canvas_obj = {
     meas_div.hide()
     $("#system_message_div").hide()
 
-    if (bonk_obj.in_bounce()) {
+    if (common_obj.in_bounce()) {
       meas_div.css({ "text-align": "center" })
       $("#system_message_div").css({ "font-size": "34px" })
     } else {
@@ -35,7 +35,7 @@ const canvas_obj = {
 
     if (selected_data) {
       $("#canvas").css("cursor", "")
-      if (bonk_obj.in_user_waveforms()) {
+      if (common_obj.in_user_waveforms()) {
         let p_num = selected_data.param_num
         dbugger.print("selected: " + p_num, false)
         let hint
@@ -63,7 +63,7 @@ const canvas_obj = {
   },
   on_load: function () {
     $("#canvas").on("mousemove", function (e) {
-      if (bonk_obj.in_user_waveforms()) {
+      if (common_obj.in_user_waveforms()) {
         const selected_index = parseInt((e.offsetX * 128) / $(this).width())
         const selected_value = 4095 - parseInt((e.offsetY * 4095) / $(this).height())
         if (waveform_obj.is_drawing()) {
