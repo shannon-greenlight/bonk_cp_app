@@ -17,14 +17,16 @@ let the_macro = {
     this.exe_button.prop("disabled", !this.macro_exists())
   },
   set_text: function () {
-    this.macro_elem.val(JSON.stringify(this.recorded_macro))
+    let text = JSON.stringify(this.recorded_macro)
+    text = text.substring(1, text.length - 1)
+    this.macro_elem.val(text)
   },
   put: function (val) {
     try {
-      this.recorded_macro = JSON.parse(val)
+      this.recorded_macro = JSON.parse(`${val}`)
       this.set_text()
     } catch (e) {
-      dbugger.print("Didn't parse")
+      dbugger.print("Didn't parse", true)
     }
     this.set_buttons()
   },
@@ -47,7 +49,7 @@ let the_macro = {
         this.record_button
           .html("Record")
           .attr("title", "Click to Start Recording")
-          .css("background-color", "#444444")
+          .css("background-color", "")
           .prop("disabled", false)
         this.exe_button.prop("disabled", false)
         this.snapshot_button.prop("disabled", false)
@@ -60,13 +62,13 @@ let the_macro = {
           .html("Stop")
           .attr("title", "Click to Stop Recording")
           .prop("disabled", false)
-        // .css("background-color", "#888")
+          .css("background-color", "")
         this.snapshot_button.prop("disabled", true)
         break
       case "EXEC":
         background_color = "#080"
         $("#play_state").html(this.state).css("background-color", background_color)
-        this.record_button.prop("disabled", true).css("background-color", "#888")
+        this.record_button.prop("disabled", false).css("background-color", "#888")
         this.exe_button.prop("disabled", true)
         this.snapshot_button.prop("disabled", true)
         break
@@ -83,10 +85,11 @@ let the_macro = {
   },
   execute: function () {
     this.put_state("EXEC")
-    this.clr_button.prop("disabled", true)
-    this.exe_button.prop("disabled", true)
+    busy_obj.set_busy()
     let macro = this.macro_elem.val()
-    console.log("Macro: " + macro)
+    console.log("Putting: " + macro)
+    this.put(`[${macro}]`)
+    console.log("Macro: ", this.recorded_macro)
     let op = ""
 
     //let parts = macro.split("\n");
@@ -100,7 +103,7 @@ let the_macro = {
   },
   end: function () {
     //console.log("Ending macro");
-    $("#exe_macro, #clr_macro").prop("disabled", false)
+    busy_obj.clear_busy()
     this.reset()
   },
   init: function () {
@@ -120,8 +123,9 @@ let the_macro = {
       self.execute()
     })
 
-    $("#macro").on("keyup", function () {
-      self.put($(this).val())
+    this.macro_elem.on("input", function (e) {
+      console.log(e)
+      self.put(`[${$(this).val()}]`)
       self.set_buttons()
     })
   },

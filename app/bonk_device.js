@@ -1,25 +1,42 @@
-// Important!!! For Electron development. Mac and Win must be developed in separate environments.
+// Important!!! For Electron development, Mac and Win must be developed in separate environments.
 // Not doing this will clobber development system. Fixed by deleting @module from node_modules. (@serial_port)
 
 device = {
-  type: "Bonkulator",
-  title: "Bonkulator Control Panel v3.4.1",
+  type: "Unset",
+  title: "Control Panel v4.0.3",
   port_label: "USB Serial Device",
+  canvas_obj: null,
   init: function () {
-    $("#busy_div").fadeOut(1).css("opacity", 1)
+    busy_obj.on_load()
   },
-  take_snapshot: function (data, out) {
-    if (common_obj.in_user_waveforms()) {
-      // console.log("Taking snapshot of " + data.fxn)
+  render_product_name: function () {
+    $("#product_name").html(`${this.type}`)
+  },
+  render_device_name: function () {
+    const device_name = data_handler.get_device_name()
+    const title = `Hi! I'm ${device_name}, your ${this.type}. And this is my Control Panel.
+ You can do lots of things through this interface that you can't do from the front panel.
+ And you don't have to wade through patch cords to get to the controls. You can change my name in Settings.`
+    $("#head_div img").attr("title", title)
+    $("#device_name").html(`"${device_name.trim()}"`)
+    // $("#device_name").html(`${device_name.trim()}`)
+  },
+  render: function () {
+    this.render_product_name()
+    this.render_device_name()
+  },
+  take_snapshot: function (out) {
+    if (data_handler.in_user_waveforms()) {
+      // console.log("Taking snapshot of " + data_handler.data.fxn)
 
       out.shift() // amend start of macro
-      const user_wave_num = data.fxn.charAt(5)
+      const user_wave_num = data_handler.get_user_wave_num()
       out.unshift("!")
       out.unshift(user_wave_num)
       out.unshift("p6")
       out.unshift("f8")
 
-      const values = data.message.split(", ")
+      const values = data_handler.get_wave_data()
       // out.push(`p6`)
       // out.push(`!`)
       out.push(`p1`)
@@ -34,37 +51,22 @@ device = {
     return out
   },
   receive_data: function () {
-    t0_button.trigger = data_handler.data.triggers[0]
-    t1_button.trigger = data_handler.data.triggers[1]
-    t2_button.trigger = data_handler.data.triggers[2]
-    t3_button.trigger = data_handler.data.triggers[3]
+    // console.log("Data: ", data_handler.data)
+  },
+  receive_globals: function () {
+    this.type = data_handler.globals.product_name
   },
   receive_status: function () {
     switch (data_handler.status.event) {
       case "trigger":
-        t0_button.set(data_handler.status.t0)
-        t1_button.set(data_handler.status.t1)
-        t2_button.set(data_handler.status.t2)
-        t3_button.set(data_handler.status.t3)
-        break
-      case "scale":
-      case "offset":
-      case "Active Time":
-      case "SampleTime":
-      case "randomness":
-      case "Idle Value":
-        dbugger.print("Status: " + data_handler.status.event, false)
-        const param = data_handler.find_param(data_handler.status.event)
-        const data_item = data_handler.data.params[0][param.param_num]
-        if (param) {
-          data_item.value = data_item.numeric_value = data_handler.status.value
-        } else {
-          console.log("Recv Status - Param not found: " + data_handler.status.event)
-        }
-        the_queue.busy = false // this data was recvd as result of a request from queue
+        // console.log("Status: ", data_handler.status)
+        t0_button.set(data_handler.status.t0, 0)
+        t1_button.set(data_handler.status.t1, 1)
+        t2_button.set(data_handler.status.t2, 2)
+        t3_button.set(data_handler.status.t3, 3)
         break
       default:
-        console.log("Unknown event: " + data_handler.status.event)
+        console.log("Unknown status event: " + data_handler.status.event)
     }
   },
 }

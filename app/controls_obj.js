@@ -1,20 +1,16 @@
 const controls_obj = {
-  build_controls: function () {
-    const activate_button = $("#activate_button")
-    if (data_handler.param_is_active()) {
-      activate_button.fadeIn()
-    } else {
-      activate_button.fadeOut()
-    }
+  render: function () {
+    // const activate_button = $("#activate_button")
+    // activate_button.prop("disabled", !data_handler.param_is_active())
 
-    if (common_obj.in_user_waveforms()) {
+    if (data_handler.in_user_waveforms()) {
       $("#adj_controls, #trigger_controls").hide()
       $("#user_waveform_controls, #draw_controls").show()
     } else {
       $("#user_waveform_controls, #draw_controls").hide()
     }
 
-    if (common_obj.in_bounce()) {
+    if (data_handler.in_bounce()) {
       $("#adj_controls, #trigger_controls").show()
     } else {
       switch (data_handler.data.fxn_num) {
@@ -27,7 +23,7 @@ const controls_obj = {
     }
   },
   on_load: function () {
-    $("#send_waveform").on("click", function () {
+    $("#import_waveform").on("click", function () {
       force_use_busy = true
       send_cmd($("#user_waveform").val())
     })
@@ -38,16 +34,20 @@ const controls_obj = {
 
     $("#clr_waveform").on("click", function () {
       $("#user_waveform").val("")
-      $("#user_waveform_button_div button").prop("disabled", true)
+      // $("#user_waveform_button_div button").prop("disabled", true)
     })
 
     $("#activate_button").on("click", function () {
       send_cmd("!")
     })
 
+    $(".cmd_button").on("click", function () {
+      // $(this).css("background-color", "var(--param_button_background)")
+    })
+
     $("#take_snapshot").on("click", function () {
-      the_macro.put(snapshot)
-      console.log(snapshot)
+      the_macro.put(app.snapshot)
+      console.log(`Snapshot: `, app.snapshot)
     })
   },
 }

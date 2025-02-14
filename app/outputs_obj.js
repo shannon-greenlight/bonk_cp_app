@@ -1,10 +1,18 @@
 const outputs_obj = {
-  build_outputs: function () {
-    if (common_obj.in_bounce()) {
+  render: function () {
+    if (data_handler.in_bounce()) {
       $(".outputs .output").hide()
       $(".outputs .bounce").show()
     } else {
-      $(".outputs .output").show()
+      //$(".outputs .output").show()
+      for (let i = 0; i < data_handler.globals.num_outputs; i++) {
+        $(`div.triggered_outputs div:nth-child(${i + 1})`).show()
+        // $(`#t${i}`).prop("disabled", false)
+      }
+      for (let i = 0; i < 8; i++) {
+        $(`div.group_outputs div:nth-child(${i + 1})`).show()
+        // $(`#t${i}`).prop("disabled", false)
+      }
       $(".outputs .bounce").hide()
     }
   },

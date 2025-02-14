@@ -13,8 +13,8 @@ async function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     autoHideMenuBar: true,
-    width: 1116,
-    height: 1006,
+    width: 1117,
+    height: 890,
     webPreferences: {
       nodeIntegration: true, // is default value after Electron v5
       contextIsolation: false, // protect against prototype pollution

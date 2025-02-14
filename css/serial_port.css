@@ -1,9 +1,21 @@
 /* for listPorts */
 #ports {
   font-size: 0.85em;
-  margin-left: 20px;
-  background-color: #ffffff;
+  margin: 0 auto;
+  margin-top: 30px;
+  /* background-image: url("../../img/water4.jpg"); */
+  background: var(--params_background);
+  /* background-color: #949ec7; */
   width: 650px;
+  /* background-image: linear-gradient(to bottom, var(--gradient_from), var(--gradient_to)); */
+  padding: 5px 25px;
+  border-radius: 20px;
+  border: 3px solid;
+}
+
+#ports div,
+#ports button {
+  border-radius: 12px;
 }
 
 #ports table {
@@ -71,9 +83,13 @@
   display: none;
 }
 
+#error_div {
+  opacity: 0.001;
+}
+
 #error {
   border: 2px solid #555;
-  background-color: #efe4e4;
+  background-color: #c2c3bf;
   color: red;
   padding: 1rem;
   font-size: 1.15rem;
@@ -84,19 +100,31 @@
 #clr_error_div {
   text-align: right;
   margin-bottom: 40px;
+  margin-top: 10px;
 }
 
 #clr_error_div button {
   margin: 0;
-  margin-top: 2px;
   padding: 5px;
-  background-color: #fff;
+  background-color: #c2c3bf;
   border: 1px solid #555;
   color: #333;
   font-weight: normal;
   font-size: 14px;
 }
 
+#no_errors {
+  color: #333;
+}
+
+#info_div {
+  /* margin-top: 20px;
+  margin-bottom: 20px; */
+  padding: 10px;
+  /* background-color: #f0f0f0; */
+  border: 1px solid #333;
+  display: none;
+}
 /* .disable_port {
   background-color: #aaa;
 }

@@ -3,44 +3,53 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' ; script-src 'self' " />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' ; script-src 'self' " /> -->
     <title></title>
     <script type="text/javascript" src="../node_modules/jquery/dist/jquery.min.js"></script>
 
     <link rel="stylesheet" href="../css/cp.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="./css/bonk_cp.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="../serial_port/css/serial_port.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="../serial_port/css/wordpress/style.css" type="text/css" media="all" />
-    <link rel="stylesheet" id="twentyseventeen-block-style-css" href="../serial_port/css/wordpress/blocks.css"
-        type="text/css" media="all" />
+    <link rel="stylesheet" href="../css/serial_port.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="../css/wordpress/style.css" type="text/css" media="all" />
+    <link rel="stylesheet" id="twentyseventeen-block-style-css" href="../css/wordpress/blocks.css" type="text/css"
+        media="all" />
 </head>
+
 
 <body>
     <div id="ports">
-        <h1>Welcome to the Bonkulator Control Panel</h1>
+        <h1>Greenface Labs Control Panel</h1>
         <h2>Please Choose a Port</h2>
         <div id="ports_table"></div>
-        <div id="error">&nbsp;</div>
-        <div id="clr_error_div"><button id="clr_error_button">Clear Error</button></div>
-        <div id="chrome-version">Chrome ver: </div>
-        <div id="electron-version">Electron ver: </div>
-        <div id="node-version">Node ver: </div>
-        <div id="serialport-version">Serialport ver: </div>
+        <div id="error_div">
+            <div id="error"><span id="no_errors">No Errors</span></div>
+            <div id="clr_error_div"><button id="clr_error_button">Clear Error</button></div>
+        </div>
+        <div id="info_div">
+            <div id="chrome-version">Chrome ver: </div>
+            <div id="electron-version">Electron ver: </div>
+            <div id="node-version">Node ver: </div>
+            <div id="serialport-version">Serialport ver: </div>
+        </div>
     </div>
     <div id="control_div">
         <div id="head_div">
             <div id="brand">
-                <strong>Greenface Labs</strong><br>The Bonkulator
+                <strong>Greenface Labs</strong>
+                <div id="product_name">Bonkulator</div>
             </div>
             <img />
             <h3 id="device_name"></h3>
-            <button id="refresh_button" title="Refresh Data">
+            <button id="info_button" class="top_button" title="Info">
+                ?
+            </button>
+            <button id="refresh_button" class="top_button" title="Refresh Data">
                 &circlearrowright;
             </button>
         </div>
         <div id="action_div">
             <div id="fxn_container">
-                <label id="fxn_label" for="fxn_div">Function</label>
                 <div id="fxn_div" class="display_box">
                     <div id="fxn_buttons"></div>
                     <div id="fxn_control_buttons" class="control_buttons">
@@ -53,22 +62,34 @@
                     </div>
                 </div>
             </div>
-            <div id="display_container">
-                <label id="param_label" for="display_div">Parameters</label>
-                <div id="display_div" class="display_box">
+            <div id="display_div" class="display_box">
+                <div id="left_controls">
+                    <label id="param_fxn_label" for="meas_div">&nbsp;</label>
                     <div id="meas_div">
                         <canvas id="canvas" height="200" width="415"></canvas>
-                        <div id="message_div"></div>
-                        <div id="system_message_div"></div>
+                        <div id="canvas_message_div"></div>
+                        <div id="system_message_div" class="big_message"></div>
                     </div>
-                    <div id="param_box">
-                        <div id="params"></div>
+                    <div id="param_box_disabler" width="415"></div>
+                    <div id="param_box" width="415">
+                        <label id="params_label" for="params_div">Parameters</label>
+                        <div id="view_switch_div">
+                            <span>Message</span>
+                            <label class="switch">
+                                <input type="checkbox" id="view_switch">
+                                <span class="view_switch_slider round"></span>
+                            </label>
+                            <span>Wave</span>
+                        </div>
+                        <div id="params" tabindex="0"></div>
                         <div id="param_buttons">
-                            <button id="up_button" class="cmd_button" data-ref="[A" title="Previous Parameter">
-                                &uarr;
+                            <button id="up_button" class="cmd_button ud_button digit_button" data-ref="[A"
+                                title="Previous Parameter">
+                                Prev Param
                             </button>
-                            <button id="down_button" class="cmd_button" data-ref="[B" title="Next Parameter">
-                                &darr;
+                            <button id="down_button" class="cmd_button ud_button digit_button" data-ref="[B"
+                                title="Next Parameter">
+                                Next Param
                             </button>
                         </div>
                         <div id="lr_buttons">
@@ -84,13 +105,20 @@
                             <button id="right_right_button" class="cmd_button" data-ref=":99" title="Select Last Digit">
                                 &#x21A0;
                             </button>
-                            <button id="upparam_button" class="cmd_button ud_button" data-ref="u"
+                            <button id="upparam_button" class="cmd_button ud_button digit_button" data-ref="u"
                                 title="Increment Selected Digit">
-                                Up
+                                Digit Up
                             </button>
-                            <button id="downparam_button" class="cmd_button ud_button" data-ref="d"
+                            <button id="downparam_button" class="cmd_button ud_button digit_button" data-ref="d"
                                 title="Decrement Selected Digit">
-                                Dn
+                                Digit Down
+                            </button>
+                        </div>
+                        <div></div>
+                        <div id="default_div">
+                            <button id="default_button" class="cmd_button def_button digit_button" data-ref="I"
+                                title="Default Selected Parameter">
+                                Default Selected
                             </button>
                         </div>
                         <div id="input_div">
@@ -98,161 +126,176 @@
                                 <div id="param_head" class="param param_head">
                                     <strong></strong>
                                 </div>
-                                <!--                        <div id="param_value" class="param">-->
-                                <!--                            <input id="param_input" type="number" min="2" max="99" value="99">-->
-                                <!--                        </div>-->
                                 <div class="clear"></div>
                             </div>
                         </div>
                     </div>
                     <div id="activate_controls">
-                        <button id="activate_button" class="controls_button">Activate</button>
-                    </div>
-                    <div id="draw_controls">
-                        <button id="draw_button" class="controls_button">Draw Waveform</button>
-                    </div>
-                    <div id="cancel_draw_controls">
-                        <button id="cancel_draw_button" class="controls_button">Cancel Draw Waveform</button>
+                        <button id="activate_button" class="controls_button cmd_button">Activate</button>
                     </div>
                 </div>
-            </div>
-            <div id="param_ctrl">
-                <button>Hide Params</button>
-            </div>
-            <div id="middle_controls">
-                <div id="trigger_controls" class="">
-                    <label for="trigger_buttons">Triggers</label>
-                    <div id="trigger_buttons" class="display_box">
-                        <div class="tog_label">T0</div>
-                        <button id="t0" class="lighted_button led_button" data-ref="t0!"
-                            title="Click to Trigger/Retrigger"></button>
-                        <div id="outputs0" class="outputs" title="Click to Enable/Disable Trigger">
-                            <div class="output">0</div>
-                            <div class="output">1</div>
-                            <div class="output">2</div>
-                            <div class="output">3</div>
-                            <div class="output">4</div>
-                            <div class="output">5</div>
-                            <div class="output">6</div>
-                            <div class="output">7</div>
-                            <div class="bounce">0</div>
-                            <div class="bounce">1</div>
+                <div id="right_controls">
+                    <div id="trig_adj_controls">
+                        <div id="trigger_controls" class="">
+                            <label for="trigger_buttons">Triggers/Group</label>
+                            <div id="trigger_buttons" class="display_box">
+                                <div class="tog_label">T0</div>
+                                <button id="t0" class="lighted_button led_button trig_button" data-ref="t0!"
+                                    title="Click to Trigger/Retrigger"></button>
+                                <div id="outputs0" class="outputs triggered_outputs"
+                                    title="Click to Enable/Disable Trigger">
+                                    <div class="output">0</div>
+                                    <div class="output">1</div>
+                                    <div class="output">2</div>
+                                    <div class="output">3</div>
+                                    <div class="output">4</div>
+                                    <div class="output">5</div>
+                                    <div class="output">6</div>
+                                    <div class="output">7</div>
+                                    <div class="bounce bounce0">0</div>
+                                    <div class="bounce bounce1">1</div>
+                                </div>
+                                <div class="tog_label">T1</div>
+                                <button id="t1" class="lighted_button led_button trig_button" data-ref="t1!"
+                                    title="Click to Trigger/Retrigger"></button>
+                                <div id="outputs1" class="outputs triggered_outputs"
+                                    title="Click to Enable/Disable Trigger">
+                                    <div class="output">0</div>
+                                    <div class="output">1</div>
+                                    <div class="output">2</div>
+                                    <div class="output">3</div>
+                                    <div class="output">4</div>
+                                    <div class="output">5</div>
+                                    <div class="output">6</div>
+                                    <div class="output">7</div>
+                                    <div class="bounce bounce0">0</div>
+                                    <div class="bounce bounce1">1</div>
+                                </div>
+                                <div class="tog_label">T2</div>
+                                <button id="t2" class="lighted_button led_button trig_button" data-ref="t2!"
+                                    title="Click to Trigger/Retrigger"></button>
+                                <div id="outputs2" class="outputs triggered_outputs"
+                                    title="Click to Enable/Disable Trigger">
+                                    <div class="output">0</div>
+                                    <div class="output">1</div>
+                                    <div class="output">2</div>
+                                    <div class="output">3</div>
+                                    <div class="output">4</div>
+                                    <div class="output">5</div>
+                                    <div class="output">6</div>
+                                    <div class="output">7</div>
+                                    <div class="bounce bounce0">0</div>
+                                    <div class="bounce bounce1">1</div>
+                                </div>
+                                <div class="tog_label">T3</div>
+                                <button id="t3" class="lighted_button led_button trig_button" data-ref="t3!"
+                                    title="Click to Trigger/Retrigger"></button>
+                                <div id="outputs3" class="outputs triggered_outputs"
+                                    title="Click to Enable/Disable Trigger">
+                                    <div class="output">0</div>
+                                    <div class="output">1</div>
+                                    <div class="output">2</div>
+                                    <div class="output">3</div>
+                                    <div class="output">4</div>
+                                    <div class="output">5</div>
+                                    <div class="output">6</div>
+                                    <div class="output">7</div>
+                                    <div class="bounce bounce0">0</div>
+                                    <div class="bounce bounce1">1</div>
+                                </div>
+                                <div id="group_label" class="tog_label">Grp</div>
+                                <button id="group" class="lighted_button led_button"
+                                    title="Click to Activate/Deactivte"></button>
+                                <div id="outputs4" class="outputs group_outputs" title="Click to Group/Ungroup">
+                                    <div class="output">0</div>
+                                    <div class="output">1</div>
+                                    <div class="output">2</div>
+                                    <div class="output">3</div>
+                                    <div class="output">4</div>
+                                    <div class="output">5</div>
+                                    <div class="output">6</div>
+                                    <div class="output">7</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="tog_label">T1</div>
-                        <button id="t1" class="lighted_button led_button" data-ref="t1!"
-                            title="Click to Trigger/Retrigger"></button>
-                        <div id="outputs1" class="outputs" title="Click to Enable/Disable Trigger">
-                            <div class="output">0</div>
-                            <div class="output">1</div>
-                            <div class="output">2</div>
-                            <div class="output">3</div>
-                            <div class="output">4</div>
-                            <div class="output">5</div>
-                            <div class="output">6</div>
-                            <div class="output">7</div>
-                            <div class="bounce">0</div>
-                            <div class="bounce">1</div>
-                        </div>
-                        <div class="tog_label">T2</div>
-                        <button id="t2" class="lighted_button led_button" data-ref="t2!"
-                            title="Click to Trigger/Retrigger"></button>
-                        <div id="outputs2" class="outputs" title="Click to Enable/Disable Trigger">
-                            <div class="output">0</div>
-                            <div class="output">1</div>
-                            <div class="output">2</div>
-                            <div class="output">3</div>
-                            <div class="output">4</div>
-                            <div class="output">5</div>
-                            <div class="output">6</div>
-                            <div class="output">7</div>
-                            <div class="bounce">0</div>
-                            <div class="bounce">1</div>
-                        </div>
-                        <div class="tog_label">T3</div>
-                        <button id="t3" class="lighted_button led_button" data-ref="t3!"
-                            title="Click to Trigger/Retrigger"></button>
-                        <div id="outputs3" class="outputs" title="Click to Enable/Disable Trigger">
-                            <div class="output">0</div>
-                            <div class="output">1</div>
-                            <div class="output">2</div>
-                            <div class="output">3</div>
-                            <div class="output">4</div>
-                            <div class="output">5</div>
-                            <div class="output">6</div>
-                            <div class="output">7</div>
-                            <div class="bounce">0</div>
-                            <div class="bounce">1</div>
-                        </div>
-                        <div id="group_label" class="tog_label">Grp</div>
-                        <button id="group" class="lighted_button led_button"
-                            title="Click to Activate/Deactivte"></button>
-                        <div id="outputs4" class="outputs" title="Click to Group/Ungroup">
-                            <div class="output">0</div>
-                            <div class="output">1</div>
-                            <div class="output">2</div>
-                            <div class="output">3</div>
-                            <div class="output">4</div>
-                            <div class="output">5</div>
-                            <div class="output">6</div>
-                            <div class="output">7</div>
-                        </div>
-                    </div>
-                </div>
-                <div id="adj_controls">
-                    <label for="adj_div" id="sliders_label">Waveform</label>
-                    <div id="adj_div" class="display_box">
-                        <div class="slider_input_div" label="Scale" max="scale_max" min="scale_min" item="Scale"
-                            cmd="S"></div>
-                        <div class="slider_input_div" label="Offset" max="offset_max" min="offset_min" item="Offset"
-                            cmd="O"></div>
-                        <div id="active_time_slider_div" class="slider_input_div" label="Active Time" max="offset_max"
-                            min="offset_min" item="Active Time" cmd="A"></div>
-                        <div id="randomness_slider_div" class="slider_input_div" label="Randomness" max="scale_max"
-                            item="Randomness" cmd="R">
-                        </div>
-                        <div id="idle_value_slider" class="slider_input_div" label="Idle Value" max="dac_fs"
-                            item="Idle Value" cmd="V"></div>
-                        <div id="sample_time_slider" class="slider_input_div" label="SampleTime" max="bounce_max"
-                            min="bounce_min" item="SampleTime" cmd="s"></div>
-                    </div>
-                </div>
-                <div id="macro_controls">
-                    <label for="macro">Macro</label>
-                    <div id="macro_container" class="display_box">
-                        <textarea name="macro" id="macro"></textarea>
-                        <div id="macro_buttons">
-                            <button id="rec_macro" class="cmd_button" title="Click to Start Recording">
-                                Record
-                            </button>
-                            <button id="exe_macro" class="cmd_button" title="Click to Play">
-                                Play
-                            </button>
-                            <button id="clr_macro" class="cmd_button" title="Click to Clear Macro">
-                                Erase
-                            </button>
-                            <button id="rec_state" class="indicator">&gt;</button>
-                            <button id="play_state" class="indicator">&gt;</button>
-                            <button id="erase_state" class="indicator">&nbsp;</button>
-                        </div>
-                        <div id="snapshot_button_div">
-                            <button id="take_snapshot" class="cmd_button" title="Click to take Snapshot">
-                                Take Snapshot
-                            </button>
+                        <div id="adj_controls">
+                            <label for="adj_div" id="sliders_label">Waveform</label>
+                            <div id="adj_div" class="display_box" tabindex="1">
+                                <!-- <div class="slider_input_div" label="Scale" max="scale_max" min="scale_min" item="Scale"
+                                    cmd="S">
+                                </div>
+                                <div class="slider_input_div" label="Offset" max="offset_max" min="offset_min"
+                                    item="Offset" cmd="O"></div>
+                                <div id="active_time_slider_div" class="slider_input_div" label="Active Time"
+                                    max="offset_max" min="offset_min" item="Active Time" cmd="A"></div>
+                                <div id="randomness_slider_div" class="slider_input_div" label="Randomness"
+                                    max="scale_max" item="Randomness" cmd="R">
+                                </div>
+                                <div id="idle_value_slider" class="slider_input_div last-one" label="Idle Value"
+                                    max="dac_fs" item="Idle Value" cmd="V">
+                                </div>
+                                <div id="sample_time_slider" class="slider_input_div last-one" label="SampleTime"
+                                    max="bounce_max" min="bounce_min" item="SampleTime" cmd="A"></div> -->
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div id="user_waveform_controls">
-                    <label for="macro">User Waveform</label>
-                    <div id="user_waveform_container" class="display_box">
-                        <textarea name="user_waveform" id="user_waveform"></textarea>
-                        <div id="user_waveform_button_div">
-                            <button id="send_waveform" class="cmd_button" title="Click to Send Waveform" disabled>
-                                Send Waveform
-                            </button>
-                            <button id="clr_waveform" class="cmd_button" title="Click to Erase Waveform" disabled>
-                                Erase
-                            </button>
+                    <div id="macro_controls">
+                        <label for="macro">Macro</label>
+                        <div id="macro_container" class="display_box">
+                            <textarea name="macro" id="macro"></textarea>
+                            <div id="macro_buttons">
+                                <button id="rec_macro" class="cmd_button" title="Click to Start Recording">
+                                    Record
+                                </button>
+                                <button id="exe_macro" class="cmd_button" title="Click to Play">
+                                    Play
+                                </button>
+                                <button id="clr_macro" class="cmd_button" title="Click to Clear Macro">
+                                    Erase
+                                </button>
+                                <button id="rec_state" class="indicator">&gt;</button>
+                                <button id="play_state" class="indicator">&gt;</button>
+                                <button id="erase_state" class="indicator">&nbsp;</button>
+                            </div>
+                            <div id="snapshot_button_div">
+                                <button id="take_snapshot" class="cmd_button" title="Click to take Snapshot">
+                                    Take Snapshot
+                                </button>
+                            </div>
                         </div>
+                    </div>
+                    <div id="user_waveform_controls">
+                        <label for="user_waveform">User Waveform</label>
+                        <div id="user_waveform_container" class="display_box">
+                            <textarea name="user_waveform" id="user_waveform"></textarea>
+                            <div id="user_waveform_button_div">
+                                <button id="import_waveform" class="cmd_button" title="Click to Import Waveform"
+                                    disabled>
+                                    Import
+                                </button>
+                                <button id="export_waveform" class="cmd_button" title="Click to Export Waveform">
+                                    Export
+                                </button>
+                                <button id="clr_waveform" class="cmd_button" title="Click to Erase Waveform" disabled>
+                                    Erase
+                                </button>
+                            </div>
+                            <div id="draw_controls">
+                                <button id="draw_button" class="cmd_button">Draw Waveform</button>
+                            </div>
+                            <div id="cancel_draw_controls">
+                                <button id="cancel_draw_button" class="cmd_button">Cancel Draw Waveform</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="skin_controls">
+                        <button id="skin_button_dn" class="cmd_button" title="Click to go to previous skin.">
+                            Skin-
+                        </button>
+                        <div id="skin_name"></div>
+                        <button id="skin_button_up" class="cmd_button" title="Click to go to next skin.">
+                            Skin+
+                        </button>
                     </div>
                 </div>
             </div>
@@ -269,19 +312,23 @@ All of the Node.js APIs are available in this process.
  -->
 <script src="../app/bonk_device.js"></script>
 <script src="../js/dbugger.js"></script>
+<script src="../js/timer_obj.js"></script>
+<script src="../js/busy_obj.js"></script>
+<script src="../js/CSSRules.js"></script>
 <script src="../app/button.js"></script>
+<script src="../js/skin_button.js"></script>
+<script src="../js/activate_button.js"></script>
 <script src="../serial_port/serial_port.js"></script>
 <script src="../js/waveform_obj.js"></script>
 <script src="../js/send_cmd.js"></script>
-<script src="../app/params_obj.js"></script>
-<script src="../app/sliders_obj.js"></script>
+<script src="../js/params_obj.js"></script>
+<script src="../js/sliders_obj.js"></script>
 <script src="../app/groups.js"></script>
 <script src="../app/controls_obj.js"></script>
 <script src="../app/outputs_obj.js"></script>
 <script src="../app/triggers_obj.js"></script>
 <script src="../app/canvas_obj.js"></script>
 <script src="../js/data_handler.js"></script>
-<script src="../app/common_obj.js"></script>
 <script src="../js/the_macro.js"></script>
 <script src="../app/renderer.js"></script>
 <script src="../js/receive_data.js"></script>

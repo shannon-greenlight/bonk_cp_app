@@ -7,6 +7,7 @@ const the_queue = {
   dequeue: function () {
     if (this.busy) {
       console.log("Hey, I'm busy!")
+      return null
     } else {
       return this.queue.shift()
     }
@@ -24,12 +25,27 @@ async function _send_cmd(cmd) {
   if (res.fail) return
   cmd = res.cmd
   the_queue.busy = true
+  // timer_obj.start()
+  console.log(`Command: ${cmd} sent to serial port: ${chosen_port}`)
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout: No response within 15 seconds")), 15000)
+  )
 
   try {
-    request_data(cmd)
-  } catch (e) {
-    console.log(e)
-    data.err = e
+    await Promise.race([request_data(cmd), timeout])
+    // console.log("Command sent successfully.")
+  } catch (error) {
+    alert(`Communication with ${device.type} lost! `, error)
+    $("#control_div").fadeOut(600, function () {
+      $("#ports").fadeIn(600)
+      listPortsTimeout = setTimeout(listPorts, 2000)
+      console.log("Resetting Timeout: " + listPortsTimeout)
+
+      listSerialPorts()
+    })
+    console.error("Failed to send command:", error)
+  } finally {
+    the_queue.busy = false
   }
 }
 
@@ -43,7 +59,7 @@ function send_cmd(cmd, force = false) {
 }
 
 refresh_screen = function () {
-  send_cmd("\n")
+  send_cmd("/")
 }
 
 // heartbeat manages the_queue
@@ -56,7 +72,3 @@ setInterval(function () {
     _send_cmd(the_queue.dequeue())
   }
 }, 250)
-
-$("#activate_button").on("click", function () {
-  send_cmd("!")
-})

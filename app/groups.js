@@ -1,8 +1,11 @@
+// index.htm is kept common to all projects
+// the data from each device is tailored to the actual number of outputs
+// while the html uses 8 outputs for all devices
+
 const OUTPUT_GROUP = 1 // for outputs
 const INPUT_GROUP = 9 // for bounce
 const GROUP_GROUP = 10 // for group
 let group = { outputs: 0 } // for Group Button
-const group_button = new Button("group", "#602b65", "#a06ba5")
 let group_active = false
 
 class OutputGroup {
@@ -13,6 +16,13 @@ class OutputGroup {
 
   toggle_output(output_num, trig_num = 0) {
     this.outputs ^= 1 << output_num
+    if (device.type === "Fafnir's Fire") {
+      if (output_num > 3) {
+        this.outputs ^= 1 << (output_num - 4)
+      } else {
+        this.outputs ^= 1 << (output_num + 4)
+      }
+    }
     if (this.group_type === GROUP_GROUP) {
       send_cmd(`G${this.outputs}`)
     } else {
@@ -26,9 +36,11 @@ class OutputGroup {
     this.group = obj
     this.outputs = outputs
     for (let i = 0; i < this.num_outputs; i++) {
-      let o = this.group.find(`div:nth-of-type(${i + (this.group_type === INPUT_GROUP ? 9 : 1)})`)
-      dbugger.print(`Output: ${o.html()}`, false)
-      dbugger.print(this.outputs, false)
+      let o = this.group.find(
+        `div:nth-of-type(${i + (this.group_type === INPUT_GROUP ? INPUT_GROUP : OUTPUT_GROUP)})`
+      )
+      dbugger.print(`Output: ${o.html()}`, this.group_type === INPUT_GROUP)
+      dbugger.print(this.outputs, this.group_type === INPUT_GROUP)
       o.css("background-color", "")
       if (this.outputs & (0x01 << i)) {
         o.addClass("selected")
@@ -40,15 +52,28 @@ class OutputGroup {
       "background-color",
       group_active ? group_button.active_color : group_button.selected_color
     )
+
+    // disable group button if no outputs are grouped
+    const outputs_grouped = (this.outputs & (this.outputs - 1)) !== 0
+    $("#group")
+      .prop("disabled", !outputs_grouped)
+      .css("background-color", outputs_grouped ? group_button.active_color : "")
+
+    if (!outputs_grouped) {
+      $("#group").attr("title", "Select more than one output to enable.")
+    } else {
+      $("#group").attr("title", group_button.get_group_title())
+    }
+
     // allow only one active at any time when in bounce
     if (this.group_type === INPUT_GROUP && this.outputs > 0) {
       dbugger.print(`Inputs: ${this.outputs}`, false)
       switch (this.outputs) {
         case 1:
-          this.group.find(`div:nth-of-type(${2 + 8})`).hide()
+          this.group.find(`div:nth-of-type(${INPUT_GROUP + 1})`).hide()
           break
         case 2:
-          this.group.find(`div:nth-of-type(${1 + 8})`).hide()
+          this.group.find(`div:nth-of-type(${INPUT_GROUP})`).hide()
           break
       }
     }
@@ -67,14 +92,12 @@ const groups_obj = {
       send_cmd(`g${send_param}`)
     })
   },
-  build_groups: function () {
-    group.outputs = data_handler.data.group
-    group_button.trigger = group
+  render: function () {
     group_active = data_handler.data.group_active == "1"
     group_button.set(group_active ? "ON" : "OFF")
     data_handler.data.triggers.forEach(function (trigger, index, arr) {
-      if (common_obj.in_bounce()) {
-        let inputs = parseInt(trigger.outputs) >> 8
+      if (data_handler.in_bounce()) {
+        let inputs = parseInt(trigger.outputs) >> data_handler.globals.num_outputs
         let obj = $(`#outputs${index}`)
         inputs_group.render(obj, inputs)
       } else {
